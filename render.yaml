@@ -23,10 +23,15 @@ services:
         name: X-Frame-Options
         value: SAMEORIGIN
 
-      # Media and fonts are stable and safe to cache hard
+      # The video is the one asset likely to be re-cut mid-campaign, and its
+      # filename is not content-hashed. 'immutable' would leave returning
+      # visitors on the old cut for a year with no way to revalidate, so it
+      # gets a short TTL instead; the ETag makes the recheck a cheap 304.
       - path: /video/*
         name: Cache-Control
-        value: public, max-age=31536000, immutable
+        value: public, max-age=3600, must-revalidate
+
+      # Images and fonts are stable, so they can cache hard
       - path: /images/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
