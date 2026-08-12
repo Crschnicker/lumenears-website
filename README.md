@@ -28,11 +28,18 @@ the tier list on the page is information only.
    to it automatically and open in a new tab. **While it is empty every one of those
    buttons is greyed out and does nothing** — there is no on-site pledge page to fall
    back to, so the site is not launch-ready until this is filled in.
-2. **Hero video.** The hero is the video, full bleed. The headline, lead, CTAs and meta
-   row start invisible and fade in on hover (or keyboard focus). Touch devices have no
-   hover, so `@media (hover: none)` shows the copy permanently and hides the "Hover for
-   details" chip. The copy is never removed from the DOM — only its opacity changes — so
-   screen readers and search engines still see it.
+2. **Hero video.** On pointer devices the hero *is* the video, full bleed: the headline,
+   lead, CTAs and meta row start invisible and fade in when the bottom-left corner is
+   hovered (or focused via keyboard). The copy is never removed from the DOM — only its
+   opacity changes — so screen readers and search engines still see it.
+
+   Phones have no hover, so `@media (hover: none), (pointer: coarse)` gives them a
+   different hero: copy plus a **Watch the video** button that plays the clip fullscreen
+   with sound. There the background loop is switched off entirely (`preload="none"`, no
+   autoplay) so a phone never downloads 6 MB it will not show. The `<video>` stays in the
+   DOM at 1×1 and invisible, because a `display: none` element cannot enter fullscreen.
+   `hero.mp4` therefore carries an audio track: muted for the desktop loop, unmuted when
+   someone taps to watch.
 
    `video/hero.mp4` is a web encode of the raw master (`Hero Video.mp4`,
    gitignored). The master opens on 2.1s of black, runs a "Say hello to LumenEars" title
@@ -40,12 +47,12 @@ the tier list on the page is information only.
    product and never flashes black. To regenerate after replacing the master:
 
    ```bash
-   ffmpeg -ss 9.0 -to 59.70 -i "Hero Video.mp4" -an -vf "scale=1600:-2" -c:v libx264 -crf 28 -preset slow -pix_fmt yuv420p -movflags +faststart video/hero.mp4
+   ffmpeg -ss 9.0 -to 59.70 -i "Hero Video.mp4" -vf "scale=1600:-2" -c:v libx264 -crf 28 -preset slow -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart video/hero.mp4
    ffmpeg -ss 1 -i video/hero.mp4 -frames:v 1 -q:v 3 images/lumenears/hero-video-poster.jpg
    ```
 
    Re-check the trim points against the new footage — `ffmpeg -i in.mp4 -vf blackdetect -f null -`
-   finds the black runs. 139 MB master in, 5.3 MB out.
+   finds the black runs. 139 MB master in, 5.9 MB out (video + AAC audio).
 
 3. **Campaign video.** Set `CAMPAIGN_VIDEO.src` in `js/lumenears.js` — a local file
    (`video/lumenears.mp4`), `youtube:VIDEO_ID`, or `vimeo:VIDEO_ID`. The section stays

@@ -497,6 +497,16 @@ button:focus-visible {
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
+/* Desktop hovers the hero to reveal the copy and watches the loop in place,
+   so the explicit watch button is a mobile-only affordance. */
+.hero-watch {
+  display: none;
+}
+
+.hero-watch i {
+  margin-right: 6px;
+}
+
 .hero-hint {
   position: absolute;
   left: 0;
@@ -547,6 +557,12 @@ button:focus-visible {
 
   .hero-hint {
     display: none;
+  }
+
+  .hero-watch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -1713,8 +1729,26 @@ button:focus-visible {
     background: linear-gradient(180deg, rgba(4, 6, 15, 0.35) 0%, rgba(4, 6, 15, 0.8) 32%, rgba(4, 6, 15, 0.95) 100%);
   }
 
-  .hero-media video {
-    object-position: center top;
+  .hero-media {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero-corner::before {
+    display: none;
+  }
+
+  .hero-section {
+    background:
+      radial-gradient(680px 460px at 78% 6%, rgba(76, 201, 255, 0.16) 0%, rgba(4, 6, 15, 0) 70%),
+      radial-gradient(600px 460px at 6% 30%, rgba(164, 92, 255, 0.16) 0%, rgba(4, 6, 15, 0) 68%),
+      linear-gradient(180deg, #070a18 0%, #04060f 100%);
   }
 
   .hero-section small { font-size: 18px; }

@@ -164,6 +164,85 @@
     })();
 
     /* -----------------------------------------------------
+       1e. Mobile hero: text + a watch button
+       Phones get no hover and no background loop, so the
+       hero is copy plus a button that plays the video
+       fullscreen, with sound. The video element stays in
+       the DOM (1px, invisible) because a display:none
+       element cannot be put into fullscreen.
+    ----------------------------------------------------- */
+    (function heroWatch() {
+        var video = document.querySelector("[data-hero-video]");
+        var button = document.querySelector("[data-hero-watch]");
+
+        if (!video || !button) {
+            return;
+        }
+
+        var noHover = window.matchMedia("(hover: none), (pointer: coarse)");
+
+        // Don't spend a phone's data on a loop it will never see.
+        function applyMode() {
+            if (noHover.matches) {
+                video.removeAttribute("autoplay");
+                video.setAttribute("preload", "none");
+                video.pause();
+            } else if (video.paused && !video.dataset.userPlaying) {
+                video.setAttribute("preload", "metadata");
+                video.play().catch(function () { /* autoplay blocked; poster stands in */ });
+            }
+        }
+
+        applyMode();
+
+        if (noHover.addEventListener) {
+            noHover.addEventListener("change", applyMode);
+        }
+
+        function goFullscreen(el) {
+            var fn = el.requestFullscreen
+                || el.webkitRequestFullscreen
+                || el.webkitEnterFullscreen   // iOS Safari: video element only
+                || el.msRequestFullscreen;
+
+            if (fn) {
+                try {
+                    fn.call(el);
+                } catch (e) { /* fall through to inline playback */ }
+            }
+        }
+
+        function restore() {
+            video.dataset.userPlaying = "";
+            video.controls = false;
+            video.muted = true;
+            video.loop = true;
+            if (noHover.matches) {
+                video.pause();
+            }
+        }
+
+        button.addEventListener("click", function () {
+            video.dataset.userPlaying = "1";
+            video.controls = true;
+            video.muted = false;
+            video.loop = false;
+            video.currentTime = 0;
+            goFullscreen(video);
+            video.play().catch(function () { /* user can hit play in the controls */ });
+        });
+
+        document.addEventListener("fullscreenchange", function () {
+            if (!document.fullscreenElement) {
+                restore();
+            }
+        });
+
+        video.addEventListener("webkitendfullscreen", restore);
+        video.addEventListener("ended", restore);
+    })();
+
+    /* -----------------------------------------------------
        2. Reveal on scroll
     ----------------------------------------------------- */
     var revealables = document.querySelectorAll(".reveal");
