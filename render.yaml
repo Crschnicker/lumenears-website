@@ -91,7 +91,10 @@ services:
         value: https://lumenears.com,https://www.lumenears.com
 
 databases:
+  # Not free: Render allows one free database per account and this account
+  # already has it. basic-256mb is the smallest paid tier, and a paid database
+  # also avoids the free tier's 30-day expiry landing mid-campaign.
   - name: lumenears-waitlist-db
     databaseName: lumenears
     user: lumenears
-    plan: free
+    plan: basic-256mb

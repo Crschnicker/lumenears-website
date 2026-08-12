@@ -109,11 +109,12 @@ curl "https://<service>.onrender.com/waitlist/export?token=$ADMIN_TOKEN" -o wait
 
 ### Things to know
 
-- **Both free plans have teeth.** A free web service sleeps after 15 minutes idle and
-  takes ~50s to wake, so the first signup of the day is slow — the popup waits 70s and
-  says so rather than failing. Render's free Postgres expires 30 days after creation.
-  $7/month for the service and a paid database removes both problems, and is worth it
-  for the duration of a campaign.
+- **The database is paid, the web service is not.** Render allows one free database per
+  account and this account already has one, so the blueprint asks for `basic-256mb`
+  (~$6/month). The API itself is still on the free plan, which sleeps after 15 minutes
+  idle and takes ~50s to wake — the popup waits 70s and explains itself rather than
+  failing, but the first signup after a quiet spell is slow. Changing the API's `plan`
+  to `starter` (~$7/month) removes that, and is worth it while the campaign is live.
 - **Duplicates are not an error.** A repeat address returns `alreadyOnList: true` and
   sends no second email, so the form cannot be used to mailbomb a stranger.
 - **Anti-spam** is a honeypot field plus 5 signups per IP per 10 minutes, in memory.
