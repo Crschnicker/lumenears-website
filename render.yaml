@@ -44,6 +44,12 @@ services:
         value: public, max-age=0, must-revalidate
 
     routes:
+      # The bare root does not resolve to index.html on its own here, so map
+      # it explicitly. (/index.html served fine while / returned 404.)
+      - type: rewrite
+        source: /
+        destination: /index.html
+
       # Pretty URLs for the legal pages. No catch-all rewrite: this is a
       # multi-page site, not an SPA, so unknown paths should 404 normally.
       - type: rewrite
