@@ -1371,14 +1371,24 @@ https://templatemo.com/tm-583-festava-live
             <span class="eyebrow">Launching soon</span>
             <h2 id="waitlist-title">Be first to know</h2>
 
-            <p id="waitlist-blurb">Leave your email and we'll send you the Kickstarter link the moment the
-                campaign goes live &mdash; along with the launch-day pledge tiers. That's the only reason
-                we'll write.</p>
+            <p id="waitlist-blurb">Leave a mobile number and we'll text you the Kickstarter link the moment
+                the campaign goes live &mdash; along with the launch-day pledge tiers. That's the only
+                reason we'll get in touch.</p>
 
             <form class="waitlist-form" data-waitlist-form novalidate>
-                <label class="visually-hidden" for="waitlist-email">Email address</label>
-                <input class="waitlist-input" id="waitlist-email" type="email" name="email" required
-                    autocomplete="email" placeholder="you@example.com" data-waitlist-email>
+                <!-- Two channels, one at a time: SMS is the default and email is a
+                     click away. Only the visible field is ever submitted. -->
+                <div class="waitlist-field" data-waitlist-field="sms">
+                    <label class="visually-hidden" for="waitlist-phone">Mobile number</label>
+                    <input class="waitlist-input" id="waitlist-phone" type="tel" name="phone"
+                        autocomplete="tel" inputmode="tel" placeholder="(555) 123-4567" data-waitlist-phone>
+                </div>
+
+                <div class="waitlist-field" data-waitlist-field="email" hidden>
+                    <label class="visually-hidden" for="waitlist-email">Email address</label>
+                    <input class="waitlist-input" id="waitlist-email" type="email" name="email"
+                        autocomplete="email" placeholder="you@example.com" data-waitlist-email>
+                </div>
 
                 <!-- Honeypot: hidden from people, irresistible to bots. -->
                 <div class="waitlist-hp" aria-hidden="true">
@@ -1387,11 +1397,16 @@ https://templatemo.com/tm-583-festava-live
                 </div>
 
                 <button class="btn custom-btn w-100" type="submit" data-waitlist-submit>Join the waitlist</button>
+
+                <p class="waitlist-switch">
+                    <button type="button" class="waitlist-switch-btn" data-waitlist-switch>Rather use email?</button>
+                </p>
             </form>
 
             <p class="waitlist-status" data-waitlist-status role="status" aria-live="polite"></p>
 
-            <p class="waitlist-fineprint">No spam, no sharing your address. Unsubscribe in one click.
+            <p class="waitlist-fineprint" data-waitlist-fineprint>One text at launch, nothing else. Message and
+                data rates may apply; reply STOP to opt out. We never share your number.
                 <a href="privacy.html">Privacy policy</a>.</p>
         </div>
     </div>

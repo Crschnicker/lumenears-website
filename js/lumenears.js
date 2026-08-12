@@ -285,9 +285,15 @@
         var overlay = document.querySelector("[data-waitlist-overlay]");
         var modal = document.querySelector("[data-waitlist-modal]");
         var form = document.querySelector("[data-waitlist-form]");
+        var phoneInput = document.querySelector("[data-waitlist-phone]");
         var input = document.querySelector("[data-waitlist-email]");
         var status = document.querySelector("[data-waitlist-status]");
         var submit = document.querySelector("[data-waitlist-submit]");
+        var switcher = document.querySelector("[data-waitlist-switch]");
+        var blurb = document.getElementById("waitlist-blurb");
+        var fineprint = document.querySelector("[data-waitlist-fineprint]");
+        var smsField = document.querySelector('[data-waitlist-field="sms"]');
+        var emailField = document.querySelector('[data-waitlist-field="email"]');
 
         if (!overlay || !modal || !form || !input || !status || !submit) {
             return;
@@ -296,6 +302,77 @@
         var STORAGE_KEY = "lumenears.waitlist";
         var lastFocused = null;
         var isOpen = false;
+        var channel = "sms";
+
+        var COPY = {
+            sms: {
+                blurb: "Leave a mobile number and we'll text you the Kickstarter link the moment the " +
+                    "campaign goes live — along with the launch-day pledge tiers. That's the only " +
+                    "reason we'll get in touch.",
+                fineprint: "One text at launch, nothing else. Message and data rates may apply; reply " +
+                    "STOP to opt out. We never share your number. ",
+                swap: "Rather use email?"
+            },
+            email: {
+                blurb: "Leave your email and we'll send you the Kickstarter link the moment the campaign " +
+                    "goes live — along with the launch-day pledge tiers. That's the only reason " +
+                    "we'll write.",
+                fineprint: "One email at launch, nothing else. No newsletter, no sharing your address. ",
+                swap: "Rather use a text?"
+            }
+        };
+
+        // Swapping the channel swaps the copy with it, so the fine print never
+        // promises a text to someone who typed an email address.
+        function setChannel(next) {
+            channel = next;
+
+            var isSms = channel === "sms";
+
+            if (smsField && emailField) {
+                smsField.hidden = !isSms;
+                emailField.hidden = isSms;
+            }
+
+            // Only the visible field submits, so the hidden one is cleared.
+            if (isSms) {
+                input.value = "";
+                input.classList.remove("is-invalid");
+            } else if (phoneInput) {
+                phoneInput.value = "";
+                phoneInput.classList.remove("is-invalid");
+            }
+
+            if (blurb) {
+                blurb.textContent = COPY[channel].blurb;
+            }
+
+            if (fineprint) {
+                fineprint.firstChild.nodeValue = COPY[channel].fineprint;
+            }
+
+            if (switcher) {
+                switcher.textContent = COPY[channel].swap;
+            }
+
+            setStatus("");
+        }
+
+        function activeInput() {
+            return channel === "sms" && phoneInput ? phoneInput : input;
+        }
+
+        // Matches the server: 10 digits is assumed North American, and
+        // anything else has to look like an international number.
+        function validPhone(value) {
+            var digits = value.replace(/\D/g, "");
+
+            if (value.charAt(0) !== "+" && (digits.length === 10 || (digits.length === 11 && digits.charAt(0) === "1"))) {
+                return true;
+            }
+
+            return value.charAt(0) === "+" && digits.length >= 8 && digits.length <= 15;
+        }
 
         // Private browsing and locked-down browsers throw on localStorage, and
         // a popup is not worth breaking the page over.
@@ -423,19 +500,33 @@
             });
         }
 
+        if (switcher) {
+            switcher.addEventListener("click", function () {
+                setChannel(channel === "sms" ? "email" : "sms");
+                activeInput().focus();
+            });
+        }
+
         form.addEventListener("submit", function (event) {
             event.preventDefault();
 
-            var email = input.value.trim();
+            var field = activeInput();
+            var value = field.value.trim();
+            var isSms = channel === "sms";
 
-            if (!EMAIL_PATTERN.test(email)) {
-                input.classList.add("is-invalid");
-                setStatus("That email address doesn't look right.", "error");
-                input.focus();
+            if (isSms ? !validPhone(value) : !EMAIL_PATTERN.test(value)) {
+                field.classList.add("is-invalid");
+                setStatus(
+                    isSms
+                        ? "That mobile number doesn't look right."
+                        : "That email address doesn't look right.",
+                    "error"
+                );
+                field.focus();
                 return;
             }
 
-            input.classList.remove("is-invalid");
+            field.classList.remove("is-invalid");
             submit.disabled = true;
             submit.textContent = "Adding you…";
             setStatus("");
@@ -449,9 +540,10 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    email: email,
+                    email: isSms ? "" : value,
+                    phone: isSms ? value : "",
                     company: form.company ? form.company.value : "",
-                    source: "popup"
+                    source: isSms ? "popup-sms" : "popup-email"
                 }),
                 signal: controller ? controller.signal : undefined
             }).then(function (response) {
@@ -469,7 +561,9 @@
                 setStatus(
                     result.data.alreadyOnList
                         ? "You're already on the list — we'll be in touch on launch day."
-                        : "You're on the list. Check your inbox for a confirmation.",
+                        : isSms
+                            ? "You're on the list. We'll text you on launch day."
+                            : "You're on the list. Check your inbox for a confirmation.",
                     "success"
                 );
 

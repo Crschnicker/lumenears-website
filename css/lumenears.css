@@ -1885,6 +1885,31 @@ button:focus-visible {
   overflow: hidden;
 }
 
+/* Channel switch — a link in everything but the markup, which needs a
+   button so it is reachable and announced correctly. */
+.waitlist-switch {
+  margin: 14px 0 0;
+  text-align: center;
+}
+
+.waitlist-switch-btn {
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  color: #8fa3c8;
+  font-size: 14px;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.waitlist-switch-btn:hover {
+  color: var(--primary-color);
+}
+
+.waitlist-field[hidden] {
+  display: none;
+}
+
 .waitlist-status {
   margin: 14px 0 0;
   min-height: 22px;

@@ -76,8 +76,9 @@ the tier list on the page is information only.
 
 ## Waitlist
 
-A popup opens 15 seconds into a first visit and asks for an email address so the
-Kickstarter link can be sent on launch day. It never reappears once someone joins or
+A popup opens 15 seconds into a first visit and asks for a mobile number — or an
+email address, via the "Rather use email?" link — so the Kickstarter link can be sent
+on launch day. It never reappears once someone joins or
 closes it (one key in `localStorage`), and the footer link `data-waitlist-open` reopens
 it on demand. `render.yaml` deploys the whole thing alongside the static site:
 
@@ -86,8 +87,9 @@ it on demand. `render.yaml` deploys the whole thing alongside the static site:
 | Popup markup | `index.html`, just above the script tags |
 | Popup behaviour | `js/lumenears.js`, section 3 |
 | API | `api/server.js` — `POST /waitlist`, `GET /healthz`, `GET /waitlist/export` |
-| Storage | Render Postgres, one `waitlist` table created on boot |
+| Storage | Render Postgres, one `waitlist` table created (and migrated) on boot |
 | Email | Resend, one confirmation per new address |
+| Email images | `images/email/` — remote-loaded, so the copy must stand without them |
 
 ### Setting it up
 
@@ -115,9 +117,16 @@ curl "https://<service>.onrender.com/waitlist/export?token=$ADMIN_TOKEN" -o wait
   idle and takes ~50s to wake — the popup waits 70s and explains itself rather than
   failing, but the first signup after a quiet spell is slow. Changing the API's `plan`
   to `starter` (~$7/month) removes that, and is worth it while the campaign is live.
-- **Duplicates are not an error.** A repeat address returns `alreadyOnList: true` and
-  sends no second email, so the form cannot be used to mailbomb a stranger.
-- **Anti-spam** is a honeypot field plus 5 signups per IP per 10 minutes, in memory.
+- **No SMS is sent yet.** Numbers are stored in E.164 (`+19495550134`), so the same
+  person typing `(949) 555-0134` twice is one row — but nothing texts them. Wiring a
+  provider (Twilio, or Resend if it ships SMS) is a separate job, and until it exists
+  the launch text has to go out by hand. The confirmation email only goes to email
+  signups; an SMS signup gets a silent, stored row.
+- **Duplicates are not an error.** A repeat address or number returns
+  `alreadyOnList: true` and sends no second email, so the form cannot be used to
+  mailbomb a stranger.
+- **Anti-spam** is a honeypot field plus `RATE_LIMIT_MAX` signups (default 5) per IP
+  per 10 minutes, in memory.
 - **CORS** is limited to `ALLOWED_ORIGINS` in `render.yaml`. Add any preview domain
   there or the browser will block the request.
 - The privacy policy (section 4) and terms (section 2) describe this list. If what the
