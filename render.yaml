@@ -98,6 +98,12 @@ services:
         value: https://lumenears.com,https://www.lumenears.com
       - key: SITE_URL
         value: https://lumenears.com
+      # The service's own address. Webhook signatures are computed over the
+      # URL SignalWire called, and behind the proxy the request can only
+      # report what the forwarded headers claim, so this pins it. Correct it
+      # if Render hands the service a different hostname.
+      - key: PUBLIC_URL
+        value: https://lumenears-waitlist-api.onrender.com
 
       # SignalWire sends the welcome text. The space URL and project ID are
       # not secret, but they differ per account, so they are prompted for too

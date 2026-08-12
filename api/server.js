@@ -18,10 +18,13 @@
     SIGNALWIRE_PROJECT_ID  project UUID from the dashboard
     SIGNALWIRE_API_TOKEN   secret, set by hand in the dashboard
     SIGNALWIRE_FROM        the purchased number, E.164
+    PUBLIC_URL             this service's own base URL, for webhook
+                           signature checking (optional but recommended)
     ADMIN_TOKEN      secret, guards the CSV export
 =======================================================*/
 "use strict";
 
+const crypto = require("crypto");
 const http = require("http");
 const { Pool } = require("pg");
 
@@ -37,6 +40,10 @@ const SW_SPACE = (process.env.SIGNALWIRE_SPACE_URL || "").replace(/^https?:\/\//
 const SW_PROJECT_ID = process.env.SIGNALWIRE_PROJECT_ID || "";
 const SW_API_TOKEN = process.env.SIGNALWIRE_API_TOKEN || "";
 const SW_FROM = process.env.SIGNALWIRE_FROM || "";
+// Signature checking hashes the exact URL SignalWire called. Behind Render's
+// proxy the request only knows what the forwarded headers claim, so this
+// pins it when set.
+const PUBLIC_URL = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
 
 // Recorded against every SMS signup. Proving what someone agreed to is the
 // whole game if a complaint ever lands, so the wording lives here and is
@@ -74,7 +81,9 @@ const SCHEMA = `
         consent_text       text,
         created_at         timestamptz NOT NULL DEFAULT now(),
         confirmation_sent  boolean NOT NULL DEFAULT false,
-        welcome_sms_sent   boolean NOT NULL DEFAULT false
+        welcome_sms_sent   boolean NOT NULL DEFAULT false,
+        opted_out          boolean NOT NULL DEFAULT false,
+        opted_out_at       timestamptz
     );
 
     -- Signups arrived as email-only before the popup offered SMS, so the
@@ -84,6 +93,8 @@ const SCHEMA = `
     ALTER TABLE waitlist ALTER COLUMN email DROP NOT NULL;
     ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS consent_text text;
     ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS welcome_sms_sent boolean NOT NULL DEFAULT false;
+    ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS opted_out boolean NOT NULL DEFAULT false;
+    ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS opted_out_at timestamptz;
 
     ALTER TABLE waitlist DROP CONSTRAINT IF EXISTS waitlist_contact_present;
     ALTER TABLE waitlist ADD CONSTRAINT waitlist_contact_present
@@ -432,6 +443,126 @@ async function sendWelcomeSms(phone) {
 }
 
 /* -------------------------------------------------------
+   Inbound SMS (SignalWire webhook)
+
+   Carriers already swallow STOP at the network level, but
+   that only stops the carrier delivering — it does not tell
+   us anything. Without this, the launch send would still
+   try the number, and the list would still hold someone who
+   asked to leave.
+------------------------------------------------------- */
+function readForm(req, limitBytes) {
+    return new Promise((resolve, reject) => {
+        let size = 0;
+        let raw = "";
+
+        req.on("data", (chunk) => {
+            size += chunk.length;
+
+            if (size > limitBytes) {
+                reject(new Error("body too large"));
+                req.destroy();
+                return;
+            }
+
+            raw += chunk;
+        });
+
+        req.on("end", () => resolve({ raw, params: new URLSearchParams(raw) }));
+        req.on("error", reject);
+    });
+}
+
+// SignalWire signs webhooks the way Twilio does: HMAC-SHA1 over the called
+// URL with every POST field appended in key order, base64'd.
+function validSignature(req, url, params) {
+    const provided = req.headers["x-signalwire-signature"] || req.headers["x-twilio-signature"];
+
+    if (!SW_API_TOKEN) {
+        console.warn("SIGNALWIRE_API_TOKEN unset — accepting webhook without checking its signature");
+        return true;
+    }
+
+    if (!provided) {
+        return false;
+    }
+
+    let payload = url;
+
+    for (const key of [...params.keys()].sort()) {
+        payload += key + params.get(key);
+    }
+
+    const expected = crypto.createHmac("sha1", SW_API_TOKEN).update(Buffer.from(payload, "utf-8")).digest("base64");
+    const a = Buffer.from(expected);
+    const b = Buffer.from(String(provided));
+
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+function laml(message) {
+    const body = message
+        ? `<Message>${message.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</Message>`
+        : "";
+
+    return `<?xml version="1.0" encoding="UTF-8"?><Response>${body}</Response>`;
+}
+
+const STOP_WORDS = ["stop", "stopall", "unsubscribe", "cancel", "end", "quit", "revoke", "optout"];
+const START_WORDS = ["start", "unstop", "yes"];
+const HELP_WORDS = ["help", "info"];
+
+async function handleInboundSms(req, res) {
+    const proto = String(req.headers["x-forwarded-proto"] || "https").split(",")[0];
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "";
+    const calledUrl = (PUBLIC_URL || `${proto}://${host}`) + req.url;
+
+    let form;
+
+    try {
+        form = await readForm(req, 8192);
+    } catch (error) {
+        send(res, 400, "bad request", {});
+        return;
+    }
+
+    if (!validSignature(req, calledUrl, form.params)) {
+        console.warn("rejected an inbound webhook with a bad signature");
+        send(res, 403, "forbidden", {});
+        return;
+    }
+
+    const from = normalizePhone(form.params.get("From") || "");
+    const word = String(form.params.get("Body") || "").trim().toLowerCase().replace(/[^a-z]/g, "");
+
+    await ready;
+
+    let reply = "";
+
+    if (from && STOP_WORDS.includes(word)) {
+        await pool.query(
+            "UPDATE waitlist SET opted_out = true, opted_out_at = now() WHERE phone = $1",
+            [from]
+        );
+        // Carriers send their own confirmation for STOP and will block ours
+        // anyway, so this deliberately answers with nothing.
+        console.log("opted out:", from);
+    } else if (from && START_WORDS.includes(word)) {
+        await pool.query(
+            "UPDATE waitlist SET opted_out = false, opted_out_at = NULL WHERE phone = $1",
+            [from]
+        );
+        reply = "You're back on the LumenEars list. We'll text once when the Kickstarter launches. Reply STOP to opt out.";
+    } else if (HELP_WORDS.includes(word)) {
+        reply = "LumenEars waitlist: we text once when our Kickstarter launches. Help: help@lumenears.com. Reply STOP to opt out.";
+    } else {
+        reply = "Thanks for the message. This number is not monitored — reach us at help@lumenears.com. Reply STOP to opt out.";
+    }
+
+    send(res, 200, laml(reply), { "Content-Type": "text/xml; charset=utf-8" });
+}
+
+/* -------------------------------------------------------
    Routes
 ------------------------------------------------------- */
 async function handleSignup(req, res, headers) {
@@ -493,7 +624,12 @@ async function handleSignup(req, res, headers) {
         : await pool.query(
             `INSERT INTO waitlist (email, phone, source, user_agent, consent_text)
              VALUES (NULL, $1, $2, $3, $4)
-             ON CONFLICT (phone) DO NOTHING
+             ON CONFLICT (phone) DO UPDATE
+                SET opted_out = false,
+                    opted_out_at = NULL,
+                    consent_text = EXCLUDED.consent_text,
+                    source = EXCLUDED.source
+              WHERE waitlist.opted_out
              RETURNING id`,
             [phone, source, agent, consent]
         );
@@ -544,7 +680,8 @@ async function handleExport(req, res, url, headers) {
     await ready;
 
     const { rows } = await pool.query(
-        `SELECT email, phone, source, created_at, confirmation_sent, welcome_sms_sent, consent_text
+        `SELECT email, phone, source, created_at, confirmation_sent, welcome_sms_sent,
+                opted_out, opted_out_at, consent_text
          FROM waitlist ORDER BY created_at`
     );
 
@@ -552,7 +689,7 @@ async function handleExport(req, res, url, headers) {
     const quote = (value) =>
         '"' + String(value === null || value === undefined ? "" : value).replace(/"/g, '""') + '"';
 
-    const csv = ["email,phone,source,created_at,confirmation_sent,welcome_sms_sent,consent_text"]
+    const csv = ["email,phone,source,created_at,confirmation_sent,welcome_sms_sent,opted_out,opted_out_at,consent_text"]
         .concat(rows.map((row) => [
             row.email || "",
             row.phone || "",
@@ -560,6 +697,8 @@ async function handleExport(req, res, url, headers) {
             row.created_at.toISOString(),
             row.confirmation_sent,
             row.welcome_sms_sent,
+            row.opted_out,
+            row.opted_out_at ? row.opted_out_at.toISOString() : "",
             quote(row.consent_text)
         ].join(",")))
         .join("\n");
@@ -584,6 +723,11 @@ const server = http.createServer(async (req, res) => {
             await ready;
             await pool.query("SELECT 1");
             send(res, 200, { ok: true }, headers);
+            return;
+        }
+
+        if (req.method === "POST" && url.pathname === "/sms/inbound") {
+            await handleInboundSms(req, res);
             return;
         }
 

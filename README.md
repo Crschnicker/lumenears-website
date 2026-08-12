@@ -99,7 +99,7 @@ it on demand. `render.yaml` deploys the whole thing alongside the static site:
 | --- | --- |
 | Popup markup | `index.html`, just above the script tags |
 | Popup behaviour | `js/lumenears.js`, section 3 |
-| API | `api/server.js` — `POST /waitlist`, `GET /healthz`, `GET /waitlist/export` |
+| API | `api/server.js` — `POST /waitlist`, `POST /sms/inbound`, `GET /healthz`, `GET /waitlist/export` |
 | Storage | Render Postgres, one `waitlist` table created (and migrated) on boot |
 | Email | Resend, one confirmation per new address |
 | SMS | SignalWire Compatibility API, one welcome text per new number |
@@ -120,11 +120,49 @@ it on demand. `render.yaml` deploys the whole thing alongside the static site:
    `LumenEars <help@lumenears.com>`. Until the domain is verified, Resend only
    delivers from `onboarding@resend.dev`, which is what the code falls back to.
 
+### Pointing the SignalWire number at the webhook
+
+In the SignalWire dashboard, open **Phone Numbers → your number → Settings**, and under
+*Messaging*:
+
+| Field | Value |
+| --- | --- |
+| Handle messages using | LaML webhooks |
+| When a message comes in | `https://lumenears-waitlist-api.onrender.com/sms/inbound` |
+| Method | `POST` |
+
+Save, then text `HELP` to the number — you should get a reply, and the service logs the
+request. Two things that bite here:
+
+- **The URL must match `PUBLIC_URL` exactly.** Signatures are an HMAC over the called
+  URL, so `http` vs `https`, a trailing slash, or a different hostname all fail the check
+  and return 403. If Render gave the service a different name, fix `PUBLIC_URL` to match
+  what you pasted into SignalWire.
+- **STOP is answered with silence, on purpose.** Carriers send their own opt-out
+  confirmation and block anything we add on top, so replying would either be swallowed or
+  arrive as a duplicate.
+
+What the webhook does:
+
+| Reply | What happens |
+| --- | --- |
+| `STOP`, `UNSUBSCRIBE`, `CANCEL`, `END`, `QUIT`, `REVOKE`, `OPTOUT` | Row marked `opted_out`, no reply sent |
+| `START`, `UNSTOP`, `YES` | Opt-out cleared, confirmation sent |
+| `HELP`, `INFO` | Points at help@lumenears.com |
+| anything else | Says the number is not monitored |
+
+Someone who opts out and later signs up on the site again is re-subscribed — that is a
+fresh, deliberate consent — and gets the welcome text again.
+
 ### Getting the list out
 
 ```bash
 curl "https://<service>.onrender.com/waitlist/export?token=$ADMIN_TOKEN" -o waitlist.csv
 ```
+
+**Filter on `opted_out` before any launch send.** The column is in the export precisely
+so the launch message never reaches someone who replied STOP; texting them anyway is the
+one mistake here with real consequences.
 
 ### Things to know
 
