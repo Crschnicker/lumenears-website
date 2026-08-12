@@ -1861,6 +1861,45 @@ button:focus-visible {
 }
 
 /*---------------------------------------
+  WAITLIST BAND + INLINE CTA
+-----------------------------------------*/
+.waitlist-band {
+  background-color: var(--body-bg-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.waitlist-band::before {
+  content: "";
+  position: absolute;
+  width: 900px;
+  height: 900px;
+  left: 50%;
+  top: -520px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(108, 76, 255, 0.22) 0%, rgba(108, 76, 255, 0) 65%);
+  pointer-events: none;
+}
+
+.waitlist-band .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* A link that has to read as a call to action inside a sentence. */
+.inline-cta {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.inline-cta:hover {
+  color: #fff;
+}
+
+/*---------------------------------------
   WAITLIST POPUP
 -----------------------------------------*/
 .waitlist-overlay {
