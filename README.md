@@ -102,6 +102,7 @@ it on demand. `render.yaml` deploys the whole thing alongside the static site:
 | API | `api/server.js` — `POST /waitlist`, `GET /healthz`, `GET /waitlist/export` |
 | Storage | Render Postgres, one `waitlist` table created (and migrated) on boot |
 | Email | Resend, one confirmation per new address |
+| SMS | SignalWire Compatibility API, one welcome text per new number |
 | Email images | `images/email/` — remote-loaded, so the copy must stand without them |
 
 ### Setting it up
@@ -109,9 +110,12 @@ it on demand. `render.yaml` deploys the whole thing alongside the static site:
 1. Deploy the blueprint. Render creates `lumenears-waitlist-api` and its database.
 2. Copy the service's real hostname into `WAITLIST_ENDPOINT` in `js/lumenears.js` —
    Render appends a suffix if the name is taken, so do not assume it.
-3. In the Render dashboard set the two secrets the blueprint deliberately does not
-   carry: `RESEND_API_KEY` and `ADMIN_TOKEN` (any long random string — it guards the
-   CSV export).
+3. Render prompts for every `sync: false` key when the blueprint syncs:
+   `RESEND_API_KEY`, `ADMIN_TOKEN` (invent a long random string — it guards the CSV
+   export), and the four SignalWire values: `SIGNALWIRE_SPACE_URL`
+   (`yourspace.signalwire.com`), `SIGNALWIRE_PROJECT_ID`, `SIGNALWIRE_API_TOKEN` and
+   `SIGNALWIRE_FROM` (the number you bought, in E.164). Leave the SignalWire values
+   blank and signups still store — the service logs that it skipped the text.
 4. Verify `lumenears.com` in Resend, then leave `RESEND_FROM` as
    `LumenEars <help@lumenears.com>`. Until the domain is verified, Resend only
    delivers from `onboarding@resend.dev`, which is what the code falls back to.
@@ -130,11 +134,15 @@ curl "https://<service>.onrender.com/waitlist/export?token=$ADMIN_TOKEN" -o wait
   idle and takes ~50s to wake — the popup waits 70s and explains itself rather than
   failing, but the first signup after a quiet spell is slow. Changing the API's `plan`
   to `starter` (~$7/month) removes that, and is worth it while the campaign is live.
-- **No SMS is sent yet.** Numbers are stored in E.164 (`+19495550134`), so the same
-  person typing `(949) 555-0134` twice is one row — but nothing texts them. Wiring a
-  provider (Twilio, or Resend if it ships SMS) is a separate job, and until it exists
-  the launch text has to go out by hand. The confirmation email only goes to email
-  signups; an SMS signup gets a silent, stored row.
+- **Two messages, and the copy says so.** A signup gets a confirmation now and one
+  message at launch — nothing else. The consent wording in the popup, the wording
+  recorded in `consent_text`, and the privacy policy all state the same thing, so
+  changing what you send means changing all three.
+- **The welcome text is one GSM-7 segment.** Adding an emoji or a curly quote flips the
+  message to UCS-2, halving the limit to 70 characters and splitting it in two at double
+  the cost. A test asserts the length.
+- **Numbers are stored in E.164** (`+19495550134`), so the same person typing
+  `(949) 555-0134` and `+1 949 555 0134` is one row.
 - **Duplicates are not an error.** A repeat address or number returns
   `alreadyOnList: true` and sends no second email, so the form cannot be used to
   mailbomb a stranger.

@@ -13,6 +13,11 @@
     ALLOWED_ORIGINS  comma-separated list for CORS
     SITE_URL         absolute base for the email's images and links
     RATE_LIMIT_MAX   signups per IP per 10 minutes (default 5)
+
+    SIGNALWIRE_SPACE_URL   e.g. lumenears.signalwire.com
+    SIGNALWIRE_PROJECT_ID  project UUID from the dashboard
+    SIGNALWIRE_API_TOKEN   secret, set by hand in the dashboard
+    SIGNALWIRE_FROM        the purchased number, E.164
     ADMIN_TOKEN      secret, guards the CSV export
 =======================================================*/
 "use strict";
@@ -26,6 +31,20 @@ const RESEND_FROM = process.env.RESEND_FROM || "LumenEars <onboarding@resend.dev
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "";
 // Absolute, because an email has no origin to resolve relative URLs against.
 const SITE_URL = (process.env.SITE_URL || "https://lumenears.com").replace(/\/$/, "");
+
+// SignalWire's Compatibility API — Twilio-shaped, Basic auth, form encoded.
+const SW_SPACE = (process.env.SIGNALWIRE_SPACE_URL || "").replace(/^https?:\/\//, "").replace(/\/$/, "");
+const SW_PROJECT_ID = process.env.SIGNALWIRE_PROJECT_ID || "";
+const SW_API_TOKEN = process.env.SIGNALWIRE_API_TOKEN || "";
+const SW_FROM = process.env.SIGNALWIRE_FROM || "";
+
+// Recorded against every SMS signup. Proving what someone agreed to is the
+// whole game if a complaint ever lands, so the wording lives here and is
+// stored verbatim rather than trusted from the browser.
+const SMS_CONSENT_TEXT =
+    "By tapping Join the waitlist, you agree to receive a confirmation text from LumenEars now " +
+    "and one more when the Kickstarter campaign launches — two messages in total. " +
+    "Message and data rates may apply. Reply STOP to opt out, HELP for help.";
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
     .split(",")
@@ -52,8 +71,10 @@ const SCHEMA = `
         phone              text,
         source             text,
         user_agent         text,
+        consent_text       text,
         created_at         timestamptz NOT NULL DEFAULT now(),
-        confirmation_sent  boolean NOT NULL DEFAULT false
+        confirmation_sent  boolean NOT NULL DEFAULT false,
+        welcome_sms_sent   boolean NOT NULL DEFAULT false
     );
 
     -- Signups arrived as email-only before the popup offered SMS, so the
@@ -61,6 +82,8 @@ const SCHEMA = `
     -- that already looks like the definition above.
     ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS phone text;
     ALTER TABLE waitlist ALTER COLUMN email DROP NOT NULL;
+    ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS consent_text text;
+    ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS welcome_sms_sent boolean NOT NULL DEFAULT false;
 
     ALTER TABLE waitlist DROP CONSTRAINT IF EXISTS waitlist_contact_present;
     ALTER TABLE waitlist ADD CONSTRAINT waitlist_contact_present
@@ -373,6 +396,42 @@ async function sendConfirmation(email) {
 }
 
 /* -------------------------------------------------------
+   Welcome text (SignalWire)
+------------------------------------------------------- */
+// Kept to one GSM-7 segment: emoji or a stray curly quote would flip the
+// whole message to UCS-2 and halve the character budget, splitting it in
+// two and doubling the cost. STOP wording is required, not decoration.
+const SMS_BODY =
+    "LumenEars: you're on the waitlist. We'll text once when the Kickstarter " +
+    "launches, and that's it. Follow along at lumenears.com. Reply STOP to opt out.";
+
+async function sendWelcomeSms(phone) {
+    if (!SW_SPACE || !SW_PROJECT_ID || !SW_API_TOKEN || !SW_FROM) {
+        console.warn("SignalWire is not configured — stored the number, skipped the text");
+        return false;
+    }
+
+    const endpoint = `https://${SW_SPACE}/api/laml/2010-04-01/Accounts/${SW_PROJECT_ID}/Messages.json`;
+    const auth = Buffer.from(`${SW_PROJECT_ID}:${SW_API_TOKEN}`).toString("base64");
+
+    const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+            Authorization: `Basic ${auth}`,
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({ From: SW_FROM, To: phone, Body: SMS_BODY }).toString()
+    });
+
+    if (!response.ok) {
+        const detail = await response.text().catch(() => "");
+        throw new Error(`signalwire responded ${response.status}: ${detail.slice(0, 300)}`);
+    }
+
+    return true;
+}
+
+/* -------------------------------------------------------
    Routes
 ------------------------------------------------------- */
 async function handleSignup(req, res, headers) {
@@ -420,20 +479,23 @@ async function handleSignup(req, res, headers) {
 
     // ON CONFLICT takes one target, so the channel that identifies this
     // signup decides which unique index guards it.
+    // Only an SMS signup consents to messages, so only that row records it.
+    const consent = phone ? SMS_CONSENT_TEXT : null;
+
     const inserted = email
         ? await pool.query(
-            `INSERT INTO waitlist (email, phone, source, user_agent)
-             VALUES ($1, $2, $3, $4)
+            `INSERT INTO waitlist (email, phone, source, user_agent, consent_text)
+             VALUES ($1, $2, $3, $4, $5)
              ON CONFLICT (lower(email)) DO NOTHING
              RETURNING id`,
-            [email, phone, source, agent]
+            [email, phone, source, agent, consent]
         )
         : await pool.query(
-            `INSERT INTO waitlist (email, phone, source, user_agent)
-             VALUES (NULL, $1, $2, $3)
+            `INSERT INTO waitlist (email, phone, source, user_agent, consent_text)
+             VALUES (NULL, $1, $2, $3, $4)
              ON CONFLICT (phone) DO NOTHING
              RETURNING id`,
-            [phone, source, agent]
+            [phone, source, agent, consent]
         );
 
     // Already on the list: say so plainly and send nothing. Re-sending the
@@ -446,13 +508,22 @@ async function handleSignup(req, res, headers) {
 
     send(res, 200, { ok: true, alreadyOnList: false }, headers);
 
-    // Nothing to confirm for an SMS signup: there is no SMS provider wired
-    // up, so those numbers wait for the launch message to be sent by hand.
+    // The signup is safely stored, so both confirmations are best-effort from
+    // here: a provider outage must not cost us the signup.
     if (!email) {
+        try {
+            const texted = await sendWelcomeSms(phone);
+
+            if (texted) {
+                await pool.query("UPDATE waitlist SET welcome_sms_sent = true WHERE id = $1", [inserted.rows[0].id]);
+            }
+        } catch (error) {
+            console.error("welcome sms failed:", error.message);
+        }
+
         return;
     }
 
-    // The signup is safely stored, so the email is best-effort from here.
     try {
         const sent = await sendConfirmation(email);
 
@@ -473,16 +544,23 @@ async function handleExport(req, res, url, headers) {
     await ready;
 
     const { rows } = await pool.query(
-        "SELECT email, phone, source, created_at, confirmation_sent FROM waitlist ORDER BY created_at"
+        `SELECT email, phone, source, created_at, confirmation_sent, welcome_sms_sent, consent_text
+         FROM waitlist ORDER BY created_at`
     );
 
-    const csv = ["email,phone,source,created_at,confirmation_sent"]
+    // Quoted, because the recorded consent wording contains commas.
+    const quote = (value) =>
+        '"' + String(value === null || value === undefined ? "" : value).replace(/"/g, '""') + '"';
+
+    const csv = ["email,phone,source,created_at,confirmation_sent,welcome_sms_sent,consent_text"]
         .concat(rows.map((row) => [
             row.email || "",
             row.phone || "",
             row.source || "",
             row.created_at.toISOString(),
-            row.confirmation_sent
+            row.confirmation_sent,
+            row.welcome_sms_sent,
+            quote(row.consent_text)
         ].join(",")))
         .join("\n");
 

@@ -292,6 +292,7 @@
         var switcher = document.querySelector("[data-waitlist-switch]");
         var blurb = document.getElementById("waitlist-blurb");
         var fineprint = document.querySelector("[data-waitlist-fineprint]");
+        var consent = document.querySelector("[data-waitlist-consent]");
         var smsField = document.querySelector('[data-waitlist-field="sms"]');
         var emailField = document.querySelector('[data-waitlist-field="email"]');
 
@@ -309,15 +310,15 @@
                 blurb: "Leave a mobile number and we'll text you the Kickstarter link the moment the " +
                     "campaign goes live — along with the launch-day pledge tiers. That's the only " +
                     "reason we'll get in touch.",
-                fineprint: "One text at launch, nothing else. Message and data rates may apply; reply " +
-                    "STOP to opt out. We never share your number. ",
+                fineprint: "No marketing, no sharing your number. ",
                 swap: "Rather use email?"
             },
             email: {
                 blurb: "Leave your email and we'll send you the Kickstarter link the moment the campaign " +
                     "goes live — along with the launch-day pledge tiers. That's the only reason " +
                     "we'll write.",
-                fineprint: "One email at launch, nothing else. No newsletter, no sharing your address. ",
+                fineprint: "One confirmation now, one email at launch, nothing else. No newsletter, no " +
+                    "sharing your address. ",
                 swap: "Rather use a text?"
             }
         };
@@ -355,11 +356,54 @@
                 switcher.textContent = COPY[channel].swap;
             }
 
+            // Only the SMS side asks for message consent.
+            if (consent) {
+                consent.hidden = !isSms;
+            }
+
             setStatus("");
         }
 
         function activeInput() {
             return channel === "sms" && phoneInput ? phoneInput : input;
+        }
+
+        // (555) 123-4567 as they type. Only US-shaped input is reformatted —
+        // anything starting with + is an international number the visitor is
+        // spelling out themselves, and rewriting it would fight them.
+        function formatPhone(value) {
+            if (value.charAt(0) === "+") {
+                return value;
+            }
+
+            var digits = value.replace(/\D/g, "").slice(0, 10);
+
+            if (digits.length < 4) {
+                return digits;
+            }
+
+            if (digits.length < 7) {
+                return "(" + digits.slice(0, 3) + ") " + digits.slice(3);
+            }
+
+            return "(" + digits.slice(0, 3) + ") " + digits.slice(3, 6) + "-" + digits.slice(6);
+        }
+
+        if (phoneInput) {
+            phoneInput.addEventListener("input", function () {
+                // Reformatting mid-string would throw the caret to the end, so
+                // it only runs when the caret is already there — which is where
+                // it is for anyone simply typing a number.
+                var atEnd = phoneInput.selectionStart === phoneInput.value.length;
+                var formatted = formatPhone(phoneInput.value);
+
+                if (!atEnd || formatted === phoneInput.value) {
+                    return;
+                }
+
+                phoneInput.value = formatted;
+                phoneInput.setSelectionRange(formatted.length, formatted.length);
+            });
         }
 
         // Matches the server: 10 digits is assumed North American, and

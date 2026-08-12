@@ -83,15 +83,31 @@ services:
         fromDatabase:
           name: lumenears-waitlist-db
           property: connectionString
-      # Secrets: set these in the Render dashboard, not here.
+      # Secrets: set these in the Render dashboard, not here. Render prompts
+      # for every sync:false key when the blueprint is applied.
       - key: RESEND_API_KEY
+        sync: false
+      - key: SIGNALWIRE_API_TOKEN
         sync: false
       - key: ADMIN_TOKEN
         sync: false
+
       - key: RESEND_FROM
         value: LumenEars <help@lumenears.com>
       - key: ALLOWED_ORIGINS
         value: https://lumenears.com,https://www.lumenears.com
+      - key: SITE_URL
+        value: https://lumenears.com
+
+      # SignalWire sends the welcome text. The space URL and project ID are
+      # not secret, but they differ per account, so they are prompted for too
+      # rather than baked in wrong.
+      - key: SIGNALWIRE_SPACE_URL
+        sync: false
+      - key: SIGNALWIRE_PROJECT_ID
+        sync: false
+      - key: SIGNALWIRE_FROM
+        sync: false
 
 databases:
   # Not free: Render allows one free database per account and this account

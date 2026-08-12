@@ -1974,6 +1974,23 @@ button:focus-visible {
   overflow: hidden;
 }
 
+/* Consent sits with the button that gives it, not buried in the fine print. */
+.waitlist-consent {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #8b9ac0;
+}
+
+.waitlist-consent strong {
+  color: #c2cee9;
+  font-weight: 600;
+}
+
+.waitlist-consent[hidden] {
+  display: none;
+}
+
 /* Channel switch — a link in everything but the markup, which needs a
    button so it is reachable and announced correctly. */
 .waitlist-switch {
