@@ -24,9 +24,11 @@ the tier list on the page is information only.
 ## Before launch
 
 1. **Kickstarter URL — the one required edit.** Open `js/lumenears.js` and set
-   `KICKSTARTER_URL` to the live campaign link. All 14 elements with `data-ks-link` (nav
-   buttons, hero CTA, the eight tier buttons, the back-the-campaign CTA, footer) repoint
-   to it automatically and open in a new tab. **While it is empty every one of those
+   `KICKSTARTER_URL` to the live campaign link. Every element with `data-ks-link` (hero
+   CTA, the eight tier buttons, the back-the-campaign CTA, header and footer links)
+   repoints to it automatically and opens in a new tab. The nav button is deliberately
+   not one of them: it opens the waitlist popup instead, since the campaign has nowhere
+   to send anyone until launch day. **While it is empty every one of those
    buttons is greyed out and does nothing** — there is no on-site pledge page to fall
    back to, so the site is not launch-ready until this is filled in.
 2. **Hero video.** On pointer devices the hero *is* the video, full bleed: the headline,
