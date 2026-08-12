@@ -1679,15 +1679,15 @@ button:focus-visible {
 }
 
 /*---------------------------------------
-  ABOUT US / FOUNDER
+  ABOUT US / TEAM
 -----------------------------------------*/
-.founder-section {
+.team-section {
   background-color: var(--section-bg-color);
   position: relative;
   overflow: hidden;
 }
 
-.founder-section::after {
+.team-section::after {
   content: "";
   position: absolute;
   width: 620px;
@@ -1699,17 +1699,17 @@ button:focus-visible {
   pointer-events: none;
 }
 
-.founder-section .container {
+.team-section .container {
   position: relative;
   z-index: 2;
 }
 
-.founder-photo-wrap {
+.team-photo-wrap {
   position: relative;
   padding-bottom: 40px;
 }
 
-.founder-photo {
+.team-photo {
   border-radius: 20px;
   border: 1px solid rgba(124, 164, 255, 0.24);
   box-shadow: 0 26px 70px rgba(0, 0, 0, 0.6);
@@ -1719,7 +1719,7 @@ button:focus-visible {
 
 /* Name plate overlaps the bottom of the portrait, which is why the wrapper
    carries the extra padding above. */
-.founder-name-card {
+.team-name-card {
   position: absolute;
   left: 24px;
   right: 24px;
@@ -1733,13 +1733,13 @@ button:focus-visible {
   border: 1px solid rgba(124, 164, 255, 0.28);
 }
 
-.founder-name-card h3 {
+.team-name-card h3 {
   font-size: 24px;
   color: #fff;
   margin-bottom: 4px;
 }
 
-.founder-name-card p {
+.team-name-card p {
   color: var(--primary-color);
   font-size: 14px;
   font-weight: 500;
@@ -1747,13 +1747,27 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
-.founder-bio p {
+.team-bio p {
   color: var(--p-color);
 }
 
+/* Breathing room between the two bios, which sit in the same row. */
+.team-row-gap {
+  margin-top: 72px;
+}
+
 @media screen and (max-width: 991px) {
-  .founder-bio {
+  .team-bio {
     margin-top: 10px;
+  }
+
+  .team-row-gap {
+    margin-top: 56px;
+  }
+
+  /* The mirrored desktop order collapses back to photo-then-copy here. */
+  .team-row-gap + .team-row-gap {
+    margin-top: 0;
   }
 }
 
