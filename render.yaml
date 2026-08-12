@@ -1,0 +1,55 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Static site, no build step: the repo root IS the published directory.
+# The 133 MB raw video master (Hero Video.mp4) is gitignored, so it never
+# reaches Render; video/hero.mp4 is the 5 MB web encode that ships.
+
+services:
+  - type: web
+    name: lumenears-website
+    runtime: static
+    plan: free
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: true
+
+    headers:
+      # Baseline hardening on everything
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+
+      # Media and fonts are stable and safe to cache hard
+      - path: /video/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /images/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /fonts/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+
+      # CSS and JS filenames are not content-hashed, so they must revalidate
+      # or edits would never reach anyone holding a cached copy.
+      - path: /css/*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /js/*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+
+    routes:
+      # Pretty URLs for the legal pages. No catch-all rewrite: this is a
+      # multi-page site, not an SPA, so unknown paths should 404 normally.
+      - type: rewrite
+        source: /terms
+        destination: /terms.html
+      - type: rewrite
+        source: /privacy
+        destination: /privacy.html

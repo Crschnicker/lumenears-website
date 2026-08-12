@@ -10,3 +10,7 @@ desktop.ini
 
 # Local scratch / screenshot harness
 _shot*.html
+
+# Raw video masters — the web-sized encode in video/ is what ships
+/Hero Video.mp4
+*.master.mp4

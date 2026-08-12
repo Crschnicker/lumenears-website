@@ -135,6 +135,14 @@ strong, b {
   margin-inline: auto;
 }
 
+/* The template stacks 100px top and 100px bottom, so every section boundary
+   opened a ~200px trough. 68px each side keeps the sections distinct without
+   the dead band between them. */
+.section-padding {
+  padding-top: 68px;
+  padding-bottom: 68px;
+}
+
 /*---------------------------------------
   SECTION SHELLS
 -----------------------------------------*/
@@ -262,15 +270,51 @@ strong, b {
   NAVIGATION
 -----------------------------------------*/
 .navbar {
-  background: rgba(4, 6, 15, 0.72);
+  background: #05070f;
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
   border-bottom: 1px solid rgba(124, 164, 255, 0.14);
   padding-top: 12px;
   padding-bottom: 12px;
+  position: relative;
+  z-index: 999;
+}
+
+/* The nav used to be sticky from the first pixel, which meant it slid straight
+   over the top of the hero video and clipped the ears. It now scrolls away with
+   the hero and only re-attaches once the hero is behind you. */
+.navbar.is-stuck {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  animation: navDrop 0.28s ease-out;
+}
+
+@keyframes navDrop {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+/* Pages with no hero video (the legal pages) have nothing to clip, so their
+   nav can stay pinned the whole way down. */
+.navbar-sticky {
   position: sticky;
   top: 0;
-  z-index: 999;
+}
+
+.navbar-spacer {
+  display: none;
+}
+
+.navbar-spacer.is-active {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar.is-stuck {
+    animation: none;
+  }
 }
 
 .navbar-brand,
@@ -278,15 +322,6 @@ strong, b {
   color: #fff;
   font-weight: 800;
   letter-spacing: -0.02em;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.brand-mark {
-  width: 30px;
-  height: 22px;
-  flex: none;
 }
 
 .navbar-nav .nav-link {
@@ -374,28 +409,151 @@ button:focus-visible {
   position: relative;
   overflow: hidden;
   height: auto;
-  min-height: 88vh;
-  padding-top: 90px;
+  min-height: 86vh;
+  display: flex;
+  align-items: flex-end;
+  padding-top: 100px;
   padding-bottom: 70px;
-  /* cast.jpg, not hero-ears.jpg: the product shot has
-     "Say hello to LumenEars" baked into its top-left corner,
-     which ghosts straight through the real headline. */
-  background-image:
-    linear-gradient(180deg, rgba(4, 6, 15, 0.5) 0%, rgba(4, 6, 15, 0.3) 40%, rgba(4, 6, 15, 0.97) 100%),
-    url('../images/lumenears/cast.jpg');
-  background-size: cover;
-  background-position: center 35%;
-  background-repeat: no-repeat;
+  background-color: #04060f;
 }
 
-.hero-section .section-overlay {
-  background: radial-gradient(1150px 700px at 18% 46%, rgba(4, 6, 15, 0.94) 0%, rgba(4, 6, 15, 0.7) 42%, rgba(4, 6, 15, 0) 76%);
-  opacity: 1;
-  z-index: 2;
+/* The video IS the hero — full bleed, edge to edge, behind everything. */
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background: #04060f;
+}
+
+.hero-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Anchored to the top edge: this footage carries burned-in captions along the
+     top of the frame, and any vertical centring crops straight through them.
+     Everything cover has to trim now comes off the bottom, which is where the
+     scrim and the copy sit anyway. */
+  object-position: center top;
+  display: block;
+}
+
+/* A permanent floor gradient so the section never butts hard into the next one,
+   and the copy always has something to sit on once it fades up. */
+.hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(4, 6, 15, 0) 45%, rgba(4, 6, 15, 0.55) 78%, rgba(4, 6, 15, 0.96) 100%);
+}
+
+/* Respect a reduced-motion preference: hold the poster frame instead of looping. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-media video {
+    display: none;
+  }
+
+  .hero-media {
+    background: #04060f url('../images/lumenears/hero-video-poster.jpg') center / cover no-repeat;
+  }
+}
+
+/* ---- Bottom-left hover zone ---------------------------------------------
+   Only this corner reveals the copy — the rest of the hero stays clear video.
+   The copy stays in the DOM (screen readers and search engines still get it);
+   only its opacity changes. :focus-within covers keyboard users tabbing to the
+   CTAs, which a hover-only rule would strand. */
+.hero-corner {
+  position: relative;
+  width: min(940px, 100%);
+  padding: 26px 34px 8px 0;
+}
+
+/* Local scrim: sized to the corner, not the whole section, so it can't wash
+   out the product in the middle of the frame. */
+.hero-corner::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -140px;
+  bottom: -160px;
+  left: -50vw;
+  right: -220px;
+  /* Anchored to the bottom-left corner and falling off in every direction, so
+     it never draws a hard edge across the footage. */
+  background: radial-gradient(1500px 900px at calc(50vw + 40px) 100%,
+    rgba(4, 6, 15, 0.95) 0%,
+    rgba(4, 6, 15, 0.88) 30%,
+    rgba(4, 6, 15, 0.6) 52%,
+    rgba(4, 6, 15, 0) 74%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.hero-copy {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hero-hint {
+  position: absolute;
+  left: 0;
+  bottom: 14px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: #dbe6ff;
+  background: rgba(4, 6, 15, 0.6);
+  border: 1px solid rgba(124, 164, 255, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: opacity 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-corner:hover .hero-copy,
+  .hero-corner:focus-within .hero-copy {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-corner:hover::before,
+  .hero-corner:focus-within::before {
+    opacity: 1;
+  }
+
+  .hero-corner:hover .hero-hint,
+  .hero-corner:focus-within .hero-hint {
+    opacity: 0;
+  }
+}
+
+/* No hover on touch: show everything, drop the hint that can't be acted on. */
+@media (hover: none), (pointer: coarse) {
+  .hero-copy {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-corner::before {
+    opacity: 1;
+  }
+
+  .hero-hint {
+    display: none;
+  }
 }
 
 .hero-section .container {
+  position: relative;
   padding-bottom: 0;
+  width: 100%;
   z-index: 3;
 }
 
@@ -413,13 +571,29 @@ button:focus-visible {
 }
 
 .hero-copy {
-  max-width: 620px;
+  max-width: 100%;
+}
+
+.hero-section h1 small {
+  display: block;
+  font-size: 20px;
+  font-weight: 500;
+  color: #cfe0ff;
+  letter-spacing: 0.01em;
+  margin-bottom: 2px;
+}
+
+@media (max-width: 991px) {
+  .hero-copy {
+    padding-right: 0;
+  }
 }
 
 .hero-lead {
-  font-size: 20px;
+  font-size: 19px;
+  line-height: 1.55;
   color: #c8d5f0;
-  max-width: 560px;
+  max-width: 900px;
 }
 
 .hero-cta {
@@ -429,12 +603,15 @@ button:focus-visible {
   margin-top: 34px;
 }
 
+/* Sits inside .hero-cta and claims its own full-width row beneath the buttons,
+   so the block reads as two wide lines rather than a tall stack. */
 .hero-meta {
+  flex-basis: 100%;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 34px;
-  margin-top: 40px;
-  padding-top: 26px;
+  gap: 10px 30px;
+  margin-top: 26px;
+  padding-top: 20px;
   border-top: 1px solid rgba(160, 195, 255, 0.18);
 }
 
@@ -531,6 +708,10 @@ button:focus-visible {
 }
 
 .about-text-info {
+  position: static;
+  margin: 18px 0 0;
+  padding: 28px 30px;
+  border-radius: 20px;
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   background-color: rgba(11, 17, 41, 0.86);
@@ -1518,14 +1699,22 @@ button:focus-visible {
   }
 
   .hero-section {
-    padding-top: 64px;
+    padding-top: 76px;
     padding-bottom: 56px;
     min-height: auto;
-    background-position: center 22%;
   }
 
-  .hero-section .section-overlay {
-    background: linear-gradient(180deg, rgba(4, 6, 15, 0.55) 0%, rgba(4, 6, 15, 0.92) 62%);
+  /* Narrow screens have no dry margin for the copy to sit in, so the corner
+     scrim becomes a full-width wash. */
+  .hero-corner::before {
+    left: -40px;
+    right: -40px;
+    top: -60px;
+    background: linear-gradient(180deg, rgba(4, 6, 15, 0.35) 0%, rgba(4, 6, 15, 0.8) 32%, rgba(4, 6, 15, 0.95) 100%);
+  }
+
+  .hero-media video {
+    object-position: center top;
   }
 
   .hero-section small { font-size: 18px; }
@@ -1548,8 +1737,8 @@ button:focus-visible {
   /* On narrow screens the floating caption swallows the product shot —
      drop it below the image instead, overlapping just slightly. */
   .about-text-info {
-    position: static;
-    margin: -34px 16px 0;
+    margin: 16px 0 0;
+    padding: 24px 22px;
   }
 }
 
@@ -1569,4 +1758,135 @@ button:focus-visible {
 
   .accordion-button { font-size: 17px; padding: 18px 20px; }
   .accordion-body { padding: 0 20px 22px; }
+}
+
+/* Kickstarter CTAs before the campaign URL is set — see KICKSTARTER_URL in
+   js/lumenears.js. They stay visible but must not look clickable. */
+.is-ks-pending {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+/* =======================================================
+   LEGAL PAGES (terms.html, privacy.html)
+======================================================= */
+.legal-section {
+  background:
+    radial-gradient(900px 600px at 80% -10%, rgba(76, 201, 255, 0.10) 0%, rgba(4, 6, 15, 0) 70%),
+    linear-gradient(180deg, #070a18 0%, #04060f 100%);
+  min-height: 80vh;
+}
+
+.legal-title {
+  font-size: clamp(38px, 5vw, 58px);
+  color: #fff;
+  margin: 8px 0 10px;
+}
+
+.legal-updated {
+  color: #8fa3c8;
+  font-size: 15px;
+  margin-bottom: 34px;
+}
+
+.legal-callout {
+  display: flex;
+  gap: 16px;
+  padding: 24px 26px;
+  margin-bottom: 44px;
+  border-radius: 18px;
+  background: rgba(11, 17, 41, 0.8);
+  border: 1px solid rgba(124, 164, 255, 0.26);
+}
+
+.legal-callout i {
+  font-size: 24px;
+  color: #4cc9ff;
+  line-height: 1.2;
+}
+
+.legal-callout h6 {
+  color: #fff;
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+.legal-callout p {
+  color: #c2d0ea;
+}
+
+.legal-body h2 {
+  font-size: 25px;
+  color: #fff;
+  margin: 46px 0 14px;
+}
+
+.legal-body h3 {
+  font-size: 19px;
+  color: #dbe6ff;
+  margin: 28px 0 10px;
+}
+
+.legal-body p,
+.legal-body li {
+  color: #b9c7e4;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.legal-body ul {
+  padding-left: 22px;
+  margin-bottom: 18px;
+}
+
+.legal-body li {
+  margin-bottom: 8px;
+}
+
+.legal-body a {
+  color: #4cc9ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Deliberately loud: these are the blanks a lawyer or the founder must fill in
+   before the pages go live. If one ships by accident it should be obvious. */
+.legal-todo {
+  background: rgba(255, 196, 0, 0.18);
+  color: #ffd75e;
+  border: 1px dashed rgba(255, 196, 0, 0.6);
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.legal-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 56px;
+  padding-top: 34px;
+  border-top: 1px solid rgba(160, 195, 255, 0.18);
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  list-style: none;
+  padding-left: 0;
+  justify-content: flex-end;
+}
+
+@media screen and (max-width: 991px) {
+  .site-footer-links {
+    justify-content: flex-start;
+    margin-top: 14px;
+  }
+
+  .legal-body h2 {
+    font-size: 22px;
+  }
 }

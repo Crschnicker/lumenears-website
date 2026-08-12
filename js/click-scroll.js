@@ -1,7 +1,7 @@
 //jquery-click-scroll
 //original by syamsul'isul' Arifin — reworked so the section list is
 //derived from the nav itself instead of a hard-coded array. That way the
-//nav keeps working on pages (like pledge.html) that don't have every section.
+//nav keeps working on pages that do not have every section.
 
 (function ($) {
     "use strict";

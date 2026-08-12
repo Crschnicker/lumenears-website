@@ -5,13 +5,16 @@
     "use strict";
 
     /* -----------------------------------------------------
-       1. Kickstarter link
+       1. Kickstarter link  <-- THE ONE THING TO SET
        Paste the live campaign URL here once and every
-       "Back this project" button on the site points at it.
-       Leave it empty and those buttons fall back to
-       pledge.html (the on-site launch-list page).
+       "Back this project" button on the site points at it
+       and opens it in a new tab.
+
+       Until it is filled in those buttons are visibly
+       disabled: there is no on-site pledge flow to fall back
+       to any more, so a dead button beats a dead end.
     ----------------------------------------------------- */
-    var KICKSTARTER_URL = "";
+    var KICKSTARTER_URL = "";   // e.g. "https://www.kickstarter.com/projects/lumenears/lumenears"
 
     /* -----------------------------------------------------
        1b. Campaign video
@@ -30,12 +33,29 @@
         poster: "images/lumenears/hero-ears.jpg"
     };
 
-    if (KICKSTARTER_URL) {
-        var ksLinks = document.querySelectorAll("[data-ks-link]");
-        for (var i = 0; i < ksLinks.length; i++) {
+    var ksLinks = document.querySelectorAll("[data-ks-link]");
+
+    for (var i = 0; i < ksLinks.length; i++) {
+        if (KICKSTARTER_URL) {
             ksLinks[i].setAttribute("href", KICKSTARTER_URL);
             ksLinks[i].setAttribute("target", "_blank");
             ksLinks[i].setAttribute("rel", "noopener");
+        } else {
+            ksLinks[i].classList.add("is-ks-pending");
+            ksLinks[i].setAttribute("aria-disabled", "true");
+            ksLinks[i].setAttribute("title", "Campaign link coming soon");
+            ksLinks[i].addEventListener("click", function (event) {
+                event.preventDefault();
+            });
+        }
+    }
+
+    if (!KICKSTARTER_URL) {
+        var ksNote = document.querySelector("[data-ks-note]");
+        if (ksNote) {
+            ksNote.innerHTML =
+                '<i class="bi-info-circle me-1"></i> Campaign link goes live with the ' +
+                "Kickstarter — set KICKSTARTER_URL in js/lumenears.js.";
         }
     }
 
@@ -109,6 +129,41 @@
     })();
 
     /* -----------------------------------------------------
+       1d. Nav sticks only after the hero
+       A sticky-from-the-start navbar sits on top of the
+       full-bleed hero video and clips it. Instead the nav
+       scrolls away with the hero and re-attaches, fixed,
+       once the hero is out of view. The spacer takes over
+       its height at that moment so nothing jumps.
+    ----------------------------------------------------- */
+    (function stickyNavAfterHero() {
+        var navbar = document.querySelector(".navbar");
+        var hero = document.querySelector(".hero-section");
+        var spacer = document.querySelector(".navbar-spacer");
+
+        if (!navbar || !hero || !spacer) {
+            return;
+        }
+
+        function setStuck(stuck) {
+            if (stuck === navbar.classList.contains("is-stuck")) {
+                return;
+            }
+            spacer.style.height = navbar.offsetHeight + "px";
+            navbar.classList.toggle("is-stuck", stuck);
+            spacer.classList.toggle("is-active", stuck);
+        }
+
+        if (!("IntersectionObserver" in window)) {
+            return;   // no observer: leave the nav in flow, video stays unclipped
+        }
+
+        new IntersectionObserver(function (entries) {
+            setStuck(!entries[0].isIntersecting);
+        }, { threshold: 0 }).observe(hero);
+    })();
+
+    /* -----------------------------------------------------
        2. Reveal on scroll
     ----------------------------------------------------- */
     var revealables = document.querySelectorAll(".reveal");
@@ -132,46 +187,4 @@
         }
     }
 
-    /* -----------------------------------------------------
-       3. Preselect a reward tier from ?tier=... (pledge page)
-    ----------------------------------------------------- */
-    var tier = new URLSearchParams(window.location.search).get("tier");
-
-    if (tier) {
-        var radio = document.querySelector('input[name="pledge-tier"][value="' + tier + '"]');
-
-        if (radio) {
-            radio.checked = true;
-        }
-
-        var tierSelect = document.querySelector("select[data-tier-target]");
-
-        if (tierSelect) {
-            for (var o = 0; o < tierSelect.options.length; o++) {
-                if (tierSelect.options[o].value === tier) {
-                    tierSelect.selectedIndex = o;
-                    break;
-                }
-            }
-        }
-    }
-
-    /* -----------------------------------------------------
-       4. Forms are static — no backend is wired up yet.
-          Hook these up to your email provider before launch.
-    ----------------------------------------------------- */
-    var staticForms = document.querySelectorAll("form[data-static-form]");
-
-    for (var f = 0; f < staticForms.length; f++) {
-        staticForms[f].addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            var note = this.querySelector("[data-form-note]");
-            if (note) {
-                note.innerHTML =
-                    '<i class="bi-info-circle me-1"></i> This form is not connected yet — ' +
-                    'point it at your email provider before launch.';
-            }
-        });
-    }
 })();
