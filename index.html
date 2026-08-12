@@ -5,17 +5,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description"
+        content="LumenEars is a headband with two round, full-color screens that play living characters, react to you, and let you play games with your friends. Live on Kickstarter.">
+    <meta name="author" content="LumenEars">
+    <meta name="theme-color" content="#04060f">
 
-    <title>Festava Live - Bootstrap 5 CSS Template</title>
+    <title>LumenEars — Wearable Light-Ears That Come Alive</title>
+
+    <!-- SOCIAL SHARING -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="LumenEars — Wearable Light-Ears That Come Alive">
+    <meta property="og:description"
+        content="Two round, full-color screens that play living characters, react to how you move, and let you play games with your friends.">
+    <meta property="og:image" content="images/lumenears/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
 
     <!-- CSS FILES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
@@ -23,10 +36,11 @@
 
     <link href="css/templatemo-festava-live.css" rel="stylesheet">
 
+    <link href="css/lumenears.css" rel="stylesheet">
+
     <!--
 
-TemplateMo 583 Festava Live
-
+Built on TemplateMo 583 Festava Live
 https://templatemo.com/tm-583-festava-live
 
 -->
@@ -40,10 +54,15 @@ https://templatemo.com/tm-583-festava-live
             <div class="container">
                 <div class="row">
 
-                    <div class="col-lg-12 col-12 d-flex flex-wrap">
-                        <p class="d-flex me-4 mb-0">
-                            <i class="bi-person custom-icon me-2"></i>
-                            <strong class="text-dark">Welcome to Music Festival 2023</strong>
+                    <div class="col-lg-12 col-12 d-flex flex-wrap align-items-center">
+                        <p class="d-flex align-items-center me-4 mb-0">
+                            <span class="live-dot"></span>
+                            <strong>Coming to Kickstarter</strong>
+                        </p>
+
+                        <p class="d-flex align-items-center mb-0">
+                            Hardware tiers start at $189 &mdash;
+                            <a href="pledge.html" data-ks-link class="ms-2">get on the launch list</a>
                         </p>
                     </div>
 
@@ -55,10 +74,22 @@ https://templatemo.com/tm-583-festava-live
         <nav class="navbar navbar-expand-lg">
             <div class="container">
                 <a class="navbar-brand" href="index.html">
-                    Festava Live
+                    <svg class="brand-mark" viewBox="0 0 60 44" aria-hidden="true" focusable="false">
+                        <defs>
+                            <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#4cc9ff" />
+                                <stop offset="100%" stop-color="#a45cff" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="15" cy="14" r="11" fill="none" stroke="url(#brandGrad)" stroke-width="3.5" />
+                        <circle cx="45" cy="14" r="11" fill="none" stroke="url(#brandGrad)" stroke-width="3.5" />
+                        <path d="M8 26 Q30 48 52 26" fill="none" stroke="url(#brandGrad)" stroke-width="3.5"
+                            stroke-linecap="round" />
+                    </svg>
+                    LumenEars
                 </a>
 
-                <a href="ticket.html" class="btn custom-btn d-lg-none ms-auto me-4">Buy Ticket</a>
+                <a href="pledge.html" data-ks-link class="btn custom-btn d-lg-none ms-auto me-4">Back it</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +97,7 @@ https://templatemo.com/tm-583-festava-live
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav align-items-lg-center ms-auto me-lg-5">
+                    <ul class="navbar-nav align-items-lg-center ms-auto me-lg-4">
                         <li class="nav-item">
                             <a class="nav-link click-scroll" href="#section_1">Home</a>
                         </li>
@@ -76,131 +107,164 @@ https://templatemo.com/tm-583-festava-live
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_3">Artists</a>
+                            <a class="nav-link click-scroll" href="#section_3">Characters</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_4">Schedule</a>
+                            <a class="nav-link click-scroll" href="#section_4">How It Works</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_5">Pricing</a>
+                            <a class="nav-link click-scroll" href="#section_5">Rewards</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_6">Contact</a>
+                            <a class="nav-link click-scroll" href="#section_6">Roadmap</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link click-scroll" href="#section_7">FAQ</a>
                         </li>
                     </ul>
 
-                    <a href="ticket.html" class="btn custom-btn d-lg-block d-none">Buy Ticket</a>
+                    <a href="pledge.html" data-ks-link class="btn custom-btn d-lg-block d-none">Back this project</a>
                 </div>
             </div>
         </nav>
 
 
-        <section class="hero-section" id="section_1">
+        <!-- ======================= HERO ======================= -->
+        <section class="hero-section starfield" id="section_1">
             <div class="section-overlay"></div>
 
-            <div class="container d-flex justify-content-center align-items-center">
+            <div class="container">
                 <div class="row">
 
-                    <div class="col-12 mt-auto mb-5 text-center">
-                        <small>Festava Live Presents</small>
+                    <div class="col-lg-7 col-12">
+                        <div class="hero-copy">
+                            <small>Say hello to</small>
 
-                        <h1 class="text-white mb-5">Night Live 2023</h1>
+                            <h1 class="text-white text-glow mb-4">LumenEars</h1>
 
-                        <a class="btn custom-btn smoothscroll" href="#section_2">Let's begin</a>
-                    </div>
+                            <p class="hero-lead">A headband with two round, full-color screens that play living
+                                characters, react to you, and let you play games with your friends.</p>
 
-                    <div class="col-lg-12 col-12 mt-auto d-flex flex-column flex-lg-row text-center">
-                        <div class="date-wrap">
-                            <h5 class="text-white">
-                                <i class="custom-icon bi-clock me-2"></i>
-                                10 - 12<sup>th</sup>, Dec 2023
-                            </h5>
-                        </div>
+                            <div class="hero-cta">
+                                <a href="pledge.html" data-ks-link class="btn custom-btn custom-btn-lg">Back this
+                                    project</a>
+                                <a href="#section_3" class="btn custom-btn custom-btn-lg custom-border-btn smoothscroll">Meet
+                                    the characters</a>
+                            </div>
 
-                        <div class="location-wrap mx-auto py-3 py-lg-0">
-                            <h5 class="text-white">
-                                <i class="custom-icon bi-geo-alt me-2"></i>
-                                National Center, United States
-                            </h5>
-                        </div>
-
-                        <div class="social-share">
-                            <ul class="social-icon d-flex align-items-center justify-content-center">
-                                <span class="text-white me-3">Share:</span>
-
-                                <li class="social-icon-item">
-                                    <a href="#" class="social-icon-link">
-                                        <span class="bi-facebook"></span>
-                                    </a>
-                                </li>
-
-                                <li class="social-icon-item">
-                                    <a href="#" class="social-icon-link">
-                                        <span class="bi-twitter"></span>
-                                    </a>
-                                </li>
-
-                                <li class="social-icon-item">
-                                    <a href="#" class="social-icon-link">
-                                        <span class="bi-instagram"></span>
-                                    </a>
-                                </li>
-                            </ul>
+                            <div class="hero-meta">
+                                <span class="hero-meta-item">
+                                    <i class="bi-bullseye"></i> $40,000 goal
+                                </span>
+                                <span class="hero-meta-item">
+                                    <i class="bi-smartwatch"></i> Wearables
+                                </span>
+                                <span class="hero-meta-item">
+                                    <i class="bi-box-seam"></i> Est. delivery Jun 2027
+                                </span>
+                                <span class="hero-meta-item">
+                                    <i class="bi-geo-alt"></i> Irvine, CA
+                                </span>
+                            </div>
                         </div>
                     </div>
+
                 </div>
-            </div>
-
-            <div class="video-wrap">
-                <video autoplay="" loop="" muted="" class="custom-video" poster="">
-                    <source src="video/pexels-2022395.mp4" type="video/mp4">
-
-                    Your browser does not support the video tag.
-                </video>
             </div>
         </section>
 
 
+        <!-- ======================= CAMPAIGN STATS ======================= -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="row align-items-center g-4">
+
+                    <div class="col-lg-3 col-6">
+                        <p class="stat-figure">$40,000</p>
+                        <p class="stat-label">Funding goal</p>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <p class="stat-figure">30 days</p>
+                        <p class="stat-label">Campaign length</p>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <p class="stat-figure">8</p>
+                        <p class="stat-label">Worlds at launch</p>
+                    </div>
+
+                    <div class="col-lg-3 col-6">
+                        <p class="stat-figure">$189</p>
+                        <p class="stat-label">Lowest hardware tier</p>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <div class="funding-bar" role="img" aria-label="Funding progress: campaign not live yet">
+                            <span style="width: 2%"></span>
+                        </div>
+                        <p class="form-note mt-3 mb-0">
+                            <i class="bi-shield-check me-1"></i>
+                            All or nothing. This project will only be funded if it reaches its goal by the campaign
+                            deadline.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================= ABOUT ======================= -->
         <section class="about-section section-padding" id="section_2">
             <div class="container">
                 <div class="row">
 
-                    <div class="col-lg-6 col-12 mb-4 mb-lg-0 d-flex align-items-center">
-                        <div class="services-info">
-                            <h2 class="text-white mb-4">About Festava 2022</h2>
+                    <div class="col-lg-6 col-12 mb-5 mb-lg-0 d-flex align-items-center">
+                        <div class="services-info reveal">
+                            <span class="eyebrow">What it is</span>
 
-                            <p class="text-white">Festava Live is free CSS template provided by TemplateMo website. This
-                                layout is built on Bootstrap v5.2.2 CSS library. You are free to use this template for
-                                your commercial website.</p>
+                            <h2 class="text-white mb-4">Ears that <span class="text-gradient">come alive</span></h2>
 
-                            <h6 class="text-white mt-4">Once in Lifetime Experience</h6>
+                            <p>LumenEars is a wearable headband with two round, full-color displays where classic ears
+                                would be. Instead of a static shape, each ear is a little window: characters walk,
+                                blink, and play across them in real time.</p>
 
-                            <p class="text-white">You are not allowed to redistribute the template ZIP file on any other
-                                website without a permission.</p>
+                            <p>The ears react to you. Tilt your head, shake it, or turn around and the scene answers.
+                                Point your phone browser at the headband and you have a controller &mdash; no app store,
+                                nothing to install &mdash; for switching worlds and starting games with friends wearing
+                                theirs.</p>
 
-                            <h6 class="text-white mt-4">Whole Night Party</h6>
-
-                            <p class="text-white">Please tell your friends about our website. Thank you.</p>
+                            <ul class="check-list">
+                                <li>Two round, high-resolution screens with a real-time animation engine</li>
+                                <li>8 animated backgrounds and characters included at launch</li>
+                                <li>Motion-reactive: tilt, shake and head tracking</li>
+                                <li>Rechargeable LiPo battery over USB-C</li>
+                                <li>New worlds and features arrive over WiFi after you get it</li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div class="col-lg-6 col-12">
-                        <div class="about-text-wrap">
-                            <img src="images/pexels-alexander-suhorucov-6457579.jpg" class="about-image img-fluid">
+                    <div class="col-lg-6 col-12 d-flex align-items-center">
+                        <div class="about-text-wrap reveal">
+                            <img src="images/lumenears/hero-ears.jpg" class="about-image img-fluid" loading="lazy"
+                                width="1672" height="941"
+                                alt="The LumenEars headband: two round, full-color screens on a light blue band, each showing animated characters against a starfield.">
 
                             <div class="about-text-info d-flex">
                                 <div class="d-flex">
-                                    <i class="about-text-icon bi-person"></i>
+                                    <i class="about-text-icon bi-stars"></i>
                                 </div>
 
-
                                 <div class="ms-4">
-                                    <h3>a happy moment</h3>
+                                    <h3>Two screens, one headband</h3>
 
-                                    <p class="mb-0">your amazing festival experience with us</p>
+                                    <p class="mb-0">Each ear is a full-color display running a real-time animation
+                                        engine.</p>
                                 </div>
                             </div>
                         </div>
@@ -211,106 +275,489 @@ https://templatemo.com/tm-583-festava-live
         </section>
 
 
-        <section class="artists-section section-padding" id="section_3">
+        <!-- ======================= CHARACTERS & WORLDS ======================= -->
+        <section class="artists-section section-padding starfield" id="section_3">
             <div class="container">
                 <div class="row justify-content-center">
 
-                    <div class="col-12 text-center">
-                        <h2 class="mb-4">Meet Artists</h1>
+                    <div class="col-12 text-center section-title-wrap reveal">
+                        <span class="eyebrow">Characters &amp; worlds</span>
+                        <h2 class="mb-4">Everyone gets a whole cast</h2>
+                        <p class="lead-text mb-0">Eight animated backgrounds and characters ship on day one. Each one is
+                            hand-animated to run on the ears, with its own world behind it.</p>
                     </div>
 
-                    <div class="col-lg-5 col-12">
-                        <div class="artists-thumb">
+                    <div class="col-lg-3 col-sm-6 col-12 mb-4">
+                        <div class="artists-thumb reveal">
                             <div class="artists-image-wrap">
-                                <img src="images/artists/joecalih-UmTZqmMvQcw-unsplash.jpg"
-                                    class="artists-image img-fluid">
+                                <img src="images/lumenears/char-fox.jpg" class="artists-image img-fluid" loading="lazy"
+                                    alt="A rogue fox character with a dagger and cape, standing on moonlit rooftops.">
                             </div>
 
                             <div class="artists-hover">
-                                <p>
-                                    <strong>Name:</strong>
-                                    Madona
-                                </p>
-
-                                <p>
-                                    <strong>Birthdate:</strong>
-                                    August 16, 1958
-                                </p>
-
-                                <p>
-                                    <strong>Music:</strong>
-                                    Pop, R&amp;B
-                                </p>
-
+                                <p><strong>World:</strong> Moonlit Rooftops</p>
+                                <p><strong>Mood:</strong> Swashbuckling</p>
                                 <hr>
+                                <p class="mb-0">Struts the tiles at night, cape catching the wind as you turn your
+                                    head.</p>
+                            </div>
 
-                                <p class="mb-0">
-                                    <strong>Youtube Channel:</strong>
-                                    <a href="#">Madona Official</a>
-                                </p>
+                            <div class="character-name">
+                                <h5>The Rogue Fox</h5>
+                                <p>Rooftop adventurer</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-5 col-12">
-                        <div class="artists-thumb">
+                    <div class="col-lg-3 col-sm-6 col-12 mb-4">
+                        <div class="artists-thumb reveal">
                             <div class="artists-image-wrap">
-                                <img src="images/artists/abstral-official-bdlMO9z5yco-unsplash.jpg"
-                                    class="artists-image img-fluid">
+                                <img src="images/lumenears/char-mermaid.jpg" class="artists-image img-fluid"
+                                    loading="lazy"
+                                    alt="A green-haired mermaid character drifting through a sunken blue seascape.">
                             </div>
 
                             <div class="artists-hover">
-                                <p>
-                                    <strong>Name:</strong>
-                                    Rihana
-                                </p>
-
-                                <p>
-                                    <strong>Birthdate:</strong>
-                                    Feb 20, 1988
-                                </p>
-
-                                <p>
-                                    <strong>Music:</strong>
-                                    Country
-                                </p>
-
+                                <p><strong>World:</strong> Sunken Kingdom</p>
+                                <p><strong>Mood:</strong> Dreamlike</p>
                                 <hr>
+                                <p class="mb-0">Drifts past ruined arches; her hair and the current follow your
+                                    movement.</p>
+                            </div>
 
-                                <p class="mb-0">
-                                    <strong>Youtube Channel:</strong>
-                                    <a href="#">Rihana Official</a>
-                                </p>
+                            <div class="character-name">
+                                <h5>The Coral Mermaid</h5>
+                                <p>Deep-water wanderer</p>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="artists-thumb">
-                            <img src="images/artists/soundtrap-rAT6FJ6wltE-unsplash.jpg"
-                                class="artists-image img-fluid">
+                    <div class="col-lg-3 col-sm-6 col-12 mb-4">
+                        <div class="artists-thumb reveal">
+                            <div class="artists-image-wrap">
+                                <img src="images/lumenears/char-dragon.jpg" class="artists-image img-fluid"
+                                    loading="lazy" alt="A small blue-violet dragon with galaxy-patterned wings in flight.">
+                            </div>
 
                             <div class="artists-hover">
-                                <p>
-                                    <strong>Name:</strong>
-                                    Bruno Bros
-                                </p>
-
-                                <p>
-                                    <strong>Birthdate:</strong>
-                                    October 8, 1985
-                                </p>
-
-                                <p>
-                                    <strong>Music:</strong>
-                                    Pop
-                                </p>
-
+                                <p><strong>World:</strong> Nebula Skies</p>
+                                <p><strong>Mood:</strong> Cosmic</p>
                                 <hr>
-
-                                <p class="mb-0">
-                                    <strong>Youtube Channel:</strong>
-                                    <a href="#">Bruno Official</a>
-                                </p>
+                                <p class="mb-0">Wings full of stars. Shake your head and she banks into the clouds.</p>
                             </div>
+
+                            <div class="character-name">
+                                <h5>The Starlit Dragon</h5>
+                                <p>Night-sky flyer</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-6 col-12 mb-4">
+                        <div class="artists-thumb reveal">
+                            <div class="artists-image-wrap">
+                                <img src="images/lumenears/char-elephant.jpg" class="artists-image img-fluid"
+                                    loading="lazy"
+                                    alt="A small crowned elephant in a jeweled cape, walking through a bamboo forest.">
+                            </div>
+
+                            <div class="artists-hover">
+                                <p><strong>World:</strong> Bamboo Grove</p>
+                                <p><strong>Mood:</strong> Regal &amp; gentle</p>
+                                <hr>
+                                <p class="mb-0">Crowned and unhurried, she ambles through the green with you.</p>
+                            </div>
+
+                            <div class="character-name">
+                                <h5>The Royal Elephant</h5>
+                                <p>Grove sovereign</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <figure class="campaign-figure reveal">
+                            <img src="images/lumenears/worlds.jpg" loading="lazy" width="1672" height="941"
+                                alt="8 Animated Backgrounds and Characters: Lightspeed, a hyperspace tunnel; Fireworks, colorful glowing trails; and Stars at Night, a fun space theme.">
+                            <figcaption>Backgrounds included at launch &mdash; Lightspeed (hyperspace tunnel), Fireworks
+                                (colorful glowing trails) and Stars at Night (a fun space theme), plus the full character
+                                cast.</figcaption>
+                        </figure>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================= HOW IT WORKS ======================= -->
+        <section class="section-padding" id="section_4">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-12 text-center section-title-wrap reveal">
+                        <span class="eyebrow">How it works</span>
+                        <h2 class="mb-4">Simple to wear. <span class="text-gradient">Deep to play.</span></h2>
+                        <p class="lead-text mb-0">Everything runs on the headband. Your phone is just the remote.</p>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="glass-card reveal">
+                            <span class="card-icon cyan"><i class="bi-wifi"></i></span>
+                            <h3>Wireless controller</h3>
+                            <p>Open your phone browser and you are connected. Nothing to install, no account, no app
+                                store &mdash; switch worlds, start games, change settings.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="glass-card reveal">
+                            <span class="card-icon"><i class="bi-arrow-repeat"></i></span>
+                            <h3>Motion-reactive</h3>
+                            <p>Built-in motion sensing picks up tilt, shake and head tracking, so the characters answer
+                                the way you move instead of looping the same clip.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="glass-card reveal">
+                            <span class="card-icon"><i class="bi-battery-charging"></i></span>
+                            <h3>Rechargeable</h3>
+                            <p>A protected LiPo cell charges over standard USB-C. No proprietary dock, no batteries to
+                                hunt down mid-day.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-12 mt-3 mb-4 mb-lg-0">
+                        <div class="reveal">
+                            <h3 class="text-white mb-4">Tech specs</h3>
+
+                            <ul class="spec-list">
+                                <li><span><strong>Displays</strong> &mdash; Two round high-resolution screens.</span>
+                                </li>
+                                <li><span><strong>Processor</strong> &mdash; Powerful and efficient.</span></li>
+                                <li><span><strong>Graphics</strong> &mdash; Real-time animation engine.</span></li>
+                                <li><span><strong>Motion</strong> &mdash; Built-in motion sensing.</span></li>
+                                <li><span><strong>Power</strong> &mdash; Rechargeable battery.</span></li>
+                            </ul>
+
+                            <div class="locked-note">
+                                <i class="bi-lock-fill"></i>
+                                <div>
+                                    <h6>Details unlocking soon…</h6>
+                                    <p>Some specs and features are revealed as we get closer. New worlds, features and
+                                        surprises unlock as we grow.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-12 mt-3 d-flex align-items-center">
+                        <figure class="campaign-figure reveal w-100">
+                            <img src="images/lumenears/how-it-works.jpg" loading="lazy" width="1672" height="941"
+                                alt="How It Works: wireless controller via phone browser, motion-reactive tilt shake and head tracking, rechargeable LiPo battery over USB-C. Tech specs: two round high-resolution displays, powerful processor, real-time animation engine, built-in motion sensing, rechargeable battery.">
+                        </figure>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================= WHY BACK NOW ======================= -->
+        <section class="section-padding section-bg starfield">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-12 text-center section-title-wrap reveal">
+                        <span class="eyebrow">Why back now</span>
+                        <h2 class="mb-0">The launch is the best moment</h2>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="glass-card reveal">
+                            <span class="card-icon"><i class="bi-tag"></i></span>
+                            <h3>This is the best price this will ever be</h3>
+                            <p>Launch tiers are the cheapest LumenEars will ever be.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="glass-card reveal">
+                            <span class="card-icon cyan"><i class="bi-graph-up-arrow"></i></span>
+                            <h3>It grows after you get it</h3>
+                            <p>New worlds, shows and features arrive over WiFi.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="glass-card reveal">
+                            <span class="card-icon"><i class="bi-heart"></i></span>
+                            <h3>Join a community of fans</h3>
+                            <p>Share creations, discover secrets, and be part of the adventure.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-3">
+                        <figure class="campaign-figure reveal">
+                            <img src="images/lumenears/why-back-now.jpg" loading="lazy" width="1672" height="941"
+                                alt="Why Back Now: this is the best price this will ever be; it grows after you get it; join a community of fans.">
+                        </figure>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================= REWARDS ======================= -->
+        <section class="pricing-section section-padding" id="section_5">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-12 text-center section-title-wrap reveal">
+                        <span class="eyebrow">Rewards</span>
+                        <h2 class="mb-4">Pick your tier</h2>
+                        <p class="lead-text mb-0">Every hardware tier ships with the full launch cast and every stretch
+                            goal we unlock. Estimated delivery June 2027.</p>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="pricing-thumb reveal">
+                            <div class="reward-head">
+                                <h3 class="reward-name">Glow Supporter</h3>
+                                <span class="reward-price">$25</span>
+                            </div>
+
+                            <p class="reward-desc">No hardware. Backer-wall credit and all campaign updates.</p>
+
+                            <div class="reward-meta">
+                                <span class="reward-tag">Digital only</span>
+                            </div>
+
+                            <ul class="reward-includes">
+                                <li>Digital World Pack</li>
+                                <li>Backer Wall credit</li>
+                                <li>All campaign updates</li>
+                            </ul>
+
+                            <div class="reward-foot">
+                                <p class="reward-ship">Digital delivery</p>
+                                <a href="pledge.html?tier=glow-supporter" data-ks-link
+                                    class="btn custom-btn custom-border-btn">Pledge $25</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="pricing-thumb is-featured reveal">
+                            <span class="featured-flag">Best value</span>
+
+                            <div class="reward-head">
+                                <h3 class="reward-name">Early Glow</h3>
+                                <span class="reward-price">$189</span>
+                            </div>
+
+                            <p class="reward-desc">1 LumenEars headband at the lowest launch price. Limited to the first
+                                150 backers.</p>
+
+                            <div class="reward-meta">
+                                <span class="reward-tag limited">150 available</span>
+                                <span class="reward-tag">Jun 2027</span>
+                            </div>
+
+                            <ul class="reward-includes">
+                                <li>LumenEars Headband</li>
+                                <li>Early backer digital thank you</li>
+                                <li>Name in credits</li>
+                            </ul>
+
+                            <div class="reward-foot">
+                                <p class="reward-ship">Ships to United States</p>
+                                <a href="pledge.html?tier=early-glow" data-ks-link class="btn custom-btn">Pledge $189</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="pricing-thumb reveal">
+                            <div class="reward-head">
+                                <h3 class="reward-name">Early Bird</h3>
+                                <span class="reward-price">$209</span>
+                            </div>
+
+                            <p class="reward-desc">1 LumenEars headband. Limited to the next 350 backers after Early
+                                Glow sells out.</p>
+
+                            <div class="reward-meta">
+                                <span class="reward-tag limited">350 available</span>
+                                <span class="reward-tag">Jun 2027</span>
+                            </div>
+
+                            <ul class="reward-includes">
+                                <li>LumenEars Headband</li>
+                                <li>Early backer digital thank you</li>
+                                <li>Name in credits</li>
+                            </ul>
+
+                            <div class="reward-foot">
+                                <p class="reward-ship">Ships to United States</p>
+                                <a href="pledge.html?tier=early-bird" data-ks-link
+                                    class="btn custom-btn custom-border-btn">Pledge $209</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="pricing-thumb reveal">
+                            <div class="reward-head">
+                                <h3 class="reward-name">LumenEars</h3>
+                                <span class="reward-price">$239</span>
+                            </div>
+
+                            <p class="reward-desc">1 LumenEars headband (standard).</p>
+
+                            <div class="reward-meta">
+                                <span class="reward-tag">Jun 2027</span>
+                            </div>
+
+                            <ul class="reward-includes">
+                                <li>LumenEars Headband</li>
+                                <li>Name in credits</li>
+                            </ul>
+
+                            <div class="reward-foot">
+                                <p class="reward-ship">Ships to United States</p>
+                                <a href="pledge.html?tier=lumenears" data-ks-link
+                                    class="btn custom-btn custom-border-btn">Pledge $239</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="pricing-thumb reveal">
+                            <div class="reward-head">
+                                <h3 class="reward-name">Creator Edition</h3>
+                                <span class="reward-price">$289</span>
+                            </div>
+
+                            <p class="reward-desc">1 headband plus LumenEars Studio lifetime access and every world
+                                pack.</p>
+
+                            <div class="reward-meta">
+                                <span class="reward-tag">Studio access</span>
+                                <span class="reward-tag">Jun 2027</span>
+                            </div>
+
+                            <ul class="reward-includes">
+                                <li>LumenEars Headband</li>
+                                <li>Name in credits</li>
+                                <li>Exclusive animations</li>
+                            </ul>
+
+                            <div class="reward-foot">
+                                <p class="reward-ship">Ships to United States</p>
+                                <a href="pledge.html?tier=creator-edition" data-ks-link
+                                    class="btn custom-btn custom-border-btn">Pledge $289</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="pricing-thumb reveal">
+                            <div class="reward-head">
+                                <h3 class="reward-name">Duo Pack</h3>
+                                <span class="reward-price">$449</span>
+                            </div>
+
+                            <p class="reward-desc">2 LumenEars headbands (save vs. buying two) plus a world pack for
+                                each.</p>
+
+                            <div class="reward-meta">
+                                <span class="reward-tag">2 headbands</span>
+                                <span class="reward-tag">Jun 2027</span>
+                            </div>
+
+                            <ul class="reward-includes">
+                                <li>2&times; LumenEars Headband</li>
+                                <li>2&times; Name in credits</li>
+                            </ul>
+
+                            <div class="reward-foot">
+                                <p class="reward-ship">Ships to United States</p>
+                                <a href="pledge.html?tier=duo-pack" data-ks-link
+                                    class="btn custom-btn custom-border-btn">Pledge $449</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="pricing-thumb reveal">
+                            <div class="reward-head">
+                                <h3 class="reward-name">Workshop 5-Pack</h3>
+                                <span class="reward-price">$999</span>
+                            </div>
+
+                            <p class="reward-desc">5 LumenEars headbands &mdash; for families, classrooms, teams, or
+                                creators.</p>
+
+                            <div class="reward-meta">
+                                <span class="reward-tag">5 headbands</span>
+                                <span class="reward-tag">Jun 2027</span>
+                            </div>
+
+                            <ul class="reward-includes">
+                                <li>5&times; LumenEars Headband</li>
+                                <li>Name in credits</li>
+                            </ul>
+
+                            <div class="reward-foot">
+                                <p class="reward-ship">Ships to United States</p>
+                                <a href="pledge.html?tier=workshop-5-pack" data-ks-link
+                                    class="btn custom-btn custom-border-btn">Pledge $999</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="pricing-thumb reveal">
+                            <div class="reward-head">
+                                <h3 class="reward-name">Co-Creator</h3>
+                                <span class="reward-price">$2,500</span>
+                            </div>
+
+                            <p class="reward-desc">5 headbands, a credit on the page, and a session to help design a
+                                brand-new world we build and ship to everyone.</p>
+
+                            <div class="reward-meta">
+                                <span class="reward-tag limited">Only 10 available</span>
+                                <span class="reward-tag">Jun 2027</span>
+                            </div>
+
+                            <ul class="reward-includes">
+                                <li>5&times; LumenEars Headband</li>
+                                <li>Name in credits</li>
+                                <li>World design session with the team</li>
+                            </ul>
+
+                            <div class="reward-foot">
+                                <p class="reward-ship">Ships to United States</p>
+                                <a href="pledge.html?tier=co-creator" data-ks-link
+                                    class="btn custom-btn custom-border-btn">Pledge $2,500</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                        <div class="rewards-note h-100 d-flex flex-column justify-content-center reveal">
+                            <h3 class="text-white mb-3" style="font-size: 22px;">Good to know</h3>
+                            <p class="mb-2"><i class="bi-plus-circle me-2"
+                                    style="color: var(--primary-color);"></i>Optional add-ons are available on every
+                                hardware tier.</p>
+                            <p class="mb-2"><i class="bi-truck me-2" style="color: var(--primary-color);"></i>Hardware
+                                tiers ship to the United States at launch.</p>
+                            <p class="mb-0"><i class="bi-gift me-2" style="color: var(--primary-color);"></i>Every
+                                stretch goal we unlock is a free upgrade for all hardware backers.</p>
                         </div>
                     </div>
 
@@ -319,179 +766,106 @@ https://templatemo.com/tm-583-festava-live
         </section>
 
 
-        <section class="schedule-section section-padding" id="section_4">
+        <!-- ======================= ROADMAP ======================= -->
+        <section class="schedule-section section-padding starfield" id="section_6">
             <div class="container">
                 <div class="row">
 
-                    <div class="col-12 text-center">
-                        <h2 class="text-white mb-4">Event Schedule</h1>
-
-                            <div class="table-responsive">
-                                <table class="schedule-table table table-dark">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Date</th>
-
-                                            <th scope="col">Wednesday</th>
-
-                                            <th scope="col">Thursday</th>
-
-                                            <th scope="col">Friday</th>
-
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Day 1</th>
-
-                                            <td class="table-background-image-wrap pop-background-image">
-                                                <h3>Pop Night</h3>
-
-                                                <p class="mb-2">5:00 - 7:00 PM</p>
-
-                                                <p>By Adele</p>
-
-                                                <div class="section-overlay"></div>
-                                            </td>
-
-                                            <td style="background-color: #F3DCD4"></td>
-
-                                            <td class="table-background-image-wrap rock-background-image">
-                                                <h3>Rock & Roll</h3>
-
-                                                <p class="mb-2">7:00 - 11:00 PM</p>
-
-                                                <p>By Rihana</p>
-
-                                                <div class="section-overlay"></div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <th scope="row">Day 2</th>
-
-                                            <td style="background-color: #ECC9C7"></td>
-
-                                            <td>
-                                                <h3>DJ Night</h3>
-
-                                                <p class="mb-2">6:30 - 9:30 PM</p>
-
-                                                <p>By Rihana</p>
-                                            </td>
-
-                                            <td style="background-color: #D9E3DA"></td>
-                                        </tr>
-
-                                        <tr>
-                                            <th scope="row">Day 3</th>
-
-                                            <td class="table-background-image-wrap country-background-image">
-                                                <h3>Country Music</h3>
-
-                                                <p class="mb-2">4:30 - 7:30 PM</p>
-
-                                                <p>By Rihana</p>
-
-                                                <div class="section-overlay"></div>
-                                            </td>
-
-                                            <td style="background-color: #D1CFC0"></td>
-
-                                            <td>
-                                                <h3>Free Styles</h3>
-
-                                                <p class="mb-2">6:00 - 10:00 PM</p>
-
-                                                <p>By Members</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div class="col-12 text-center section-title-wrap reveal">
+                        <span class="eyebrow">Roadmap</span>
+                        <h2 class="text-white mb-4">Stretch goals &amp; timeline</h2>
+                        <p class="lead-text mb-0">Every stretch goal is a free upgrade for all hardware backers.</p>
                     </div>
-                </div>
-            </div>
-        </section>
 
+                    <div class="col-lg-6 col-12 mb-5 mb-lg-0">
+                        <h3 class="text-white mb-4">Stretch goals</h3>
 
-        <section class="pricing-section section-padding section-bg" id="section_5">
-            <div class="container">
-                <div class="row">
+                        <ul class="goal-list reveal">
+                            <li class="goal-item is-funded">
+                                <span class="goal-amount">$40,000</span>
+                                <div class="goal-body">
+                                    <h6>Funded</h6>
+                                    <p>First production run is go.</p>
+                                </div>
+                            </li>
 
-                    <div class="col-lg-8 col-12 mx-auto">
-                        <h2 class="text-center mb-4">Plans, you' love</h2>
+                            <li class="goal-item">
+                                <span class="goal-amount">$60,000</span>
+                                <div class="goal-body">
+                                    <h6>Bonus world</h6>
+                                    <p>3 new characters with animations.</p>
+                                </div>
+                            </li>
+
+                            <li class="goal-item">
+                                <span class="goal-amount">$100,000</span>
+                                <div class="goal-body">
+                                    <h6>Unlock the Studio</h6>
+                                    <p>Create your own characters.</p>
+                                </div>
+                            </li>
+
+                            <li class="goal-item">
+                                <span class="goal-amount">$125,000</span>
+                                <div class="goal-body">
+                                    <h6>Larger display option</h6>
+                                    <p>Unlock a larger display size option.</p>
+                                </div>
+                            </li>
+
+                            <li class="goal-item">
+                                <span class="goal-amount">$150,000</span>
+                                <div class="goal-body">
+                                    <h6>Community Platform</h6>
+                                    <p>Share your creations with everyone.</p>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
 
                     <div class="col-lg-6 col-12">
-                        <div class="pricing-thumb">
-                            <div class="d-flex">
-                                <div>
-                                    <h3><small>Early Bird</small> $120</h3>
+                        <h3 class="text-white mb-4">Timeline</h3>
 
-                                    <p>Including good things:</p>
-                                </div>
-
-                                <p class="pricing-tag ms-auto">Save up to <span>50%</span></h2>
-                            </div>
-
-                            <ul class="pricing-list mt-3">
-                                <li class="pricing-list-item">platform for potential customers</li>
-
-                                <li class="pricing-list-item">digital experience</li>
-
-                                <li class="pricing-list-item">high-quality sound</li>
-
-                                <li class="pricing-list-item">standard content</li>
-                            </ul>
-
-                            <a class="link-fx-1 color-contrast-higher mt-4" href="ticket.html">
-                                <span>Buy Ticket</span>
-                                <svg class="icon" viewBox="0 0 32 32" aria-hidden="true">
-                                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="16" cy="16" r="15.5"></circle>
-                                        <line x1="10" y1="18" x2="16" y2="12"></line>
-                                        <line x1="16" y1="12" x2="22" y2="18"></line>
-                                    </g>
-                                </svg>
-                            </a>
-                        </div>
+                        <ul class="timeline-list reveal">
+                            <li>
+                                <span class="timeline-when">Campaign close</span>
+                                <p class="timeline-what">Lock tiers, open pledge manager.</p>
+                            </li>
+                            <li>
+                                <span class="timeline-when">+1&ndash;2 months</span>
+                                <p class="timeline-what">Design freeze, comfort/fit pass.</p>
+                            </li>
+                            <li>
+                                <span class="timeline-when">+3&ndash;4 months</span>
+                                <p class="timeline-what">Tooling, begin FCC/CE certification.</p>
+                            </li>
+                            <li>
+                                <span class="timeline-when">+5&ndash;6 months</span>
+                                <p class="timeline-what">Engineering validation builds.</p>
+                            </li>
+                            <li>
+                                <span class="timeline-when">+7&ndash;9 months</span>
+                                <p class="timeline-what">Mass production and QC.</p>
+                            </li>
+                            <li>
+                                <span class="timeline-when">~+10 months</span>
+                                <p class="timeline-what">Fulfillment begins.</p>
+                            </li>
+                        </ul>
                     </div>
 
-                    <div class="col-lg-6 col-12 mt-4 mt-lg-0">
-                        <div class="pricing-thumb">
-                            <div class="d-flex">
-                                <div>
-                                    <h3><small>Standard</small> $240</h3>
+                    <div class="col-lg-6 col-12 mt-5">
+                        <figure class="campaign-figure reveal">
+                            <img src="images/lumenears/stretch-goals.jpg" loading="lazy" width="1672" height="941"
+                                alt="Stretch goals: $40,000 funded and first production run is go; $60,000 bonus world with 3 new characters; $100,000 unlock the Studio; $125,000 larger display size option; $150,000 community platform.">
+                        </figure>
+                    </div>
 
-                                    <p>What makes a premium festava?</p>
-                                </div>
-                            </div>
-
-                            <ul class="pricing-list mt-3">
-                                <li class="pricing-list-item">platform for potential customers</li>
-
-                                <li class="pricing-list-item">digital experience</li>
-
-                                <li class="pricing-list-item">high-quality sound</li>
-
-                                <li class="pricing-list-item">premium content</li>
-
-                                <li class="pricing-list-item">live chat support</li>
-                            </ul>
-
-                            <a class="link-fx-1 color-contrast-higher mt-4" href="ticket.html">
-                                <span>Buy Ticket</span>
-                                <svg class="icon" viewBox="0 0 32 32" aria-hidden="true">
-                                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="16" cy="16" r="15.5"></circle>
-                                        <line x1="10" y1="18" x2="16" y2="12"></line>
-                                        <line x1="16" y1="12" x2="22" y2="18"></line>
-                                    </g>
-                                </svg>
-                            </a>
-                        </div>
+                    <div class="col-lg-6 col-12 mt-5">
+                        <figure class="campaign-figure reveal">
+                            <img src="images/lumenears/timeline.jpg" loading="lazy" width="1198" height="666"
+                                alt="Timeline: campaign close, design freeze at 1-2 months, tooling and certification at 3-4 months, engineering validation builds at 5-6 months, mass production at 7-9 months, fulfillment at about 10 months.">
+                        </figure>
                     </div>
 
                 </div>
@@ -499,26 +873,147 @@ https://templatemo.com/tm-583-festava-live
         </section>
 
 
-        <section class="contact-section section-padding" id="section_6">
+        <!-- ======================= FAQ + CONTACT ======================= -->
+        <section class="contact-section section-padding" id="section_7">
             <div class="container">
                 <div class="row">
 
-                    <div class="col-lg-8 col-12 mx-auto">
-                        <h2 class="text-center mb-4">Interested? Let's talk</h2>
+                    <div class="col-lg-10 col-12 mx-auto">
+                        <div class="text-center section-title-wrap reveal">
+                            <span class="eyebrow">Questions</span>
+                            <h2 class="mb-0">Risks, honesty, and the fine print</h2>
+                        </div>
+
+                        <div class="accordion mb-5" id="faqAccordion">
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faqHeadOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faqOne" aria-expanded="true" aria-controls="faqOne">
+                                        What exactly do I get?
+                                    </button>
+                                </h2>
+                                <div id="faqOne" class="accordion-collapse collapse show" aria-labelledby="faqHeadOne"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <p>A LumenEars headband with two round, full-color screens, the full launch cast
+                                            of 8 animated backgrounds and characters, the phone-browser controller, and
+                                            every stretch goal unlocked during the campaign. Hardware tiers start at
+                                            $189.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faqHeadTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faqTwo" aria-expanded="false" aria-controls="faqTwo">
+                                        Do I need to install an app?
+                                    </button>
+                                </h2>
+                                <div id="faqTwo" class="accordion-collapse collapse" aria-labelledby="faqHeadTwo"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <p>No. The controller runs in your phone's browser &mdash; nothing to install,
+                                            no app store. You use it to switch worlds, start games and change settings.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faqHeadThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faqThree" aria-expanded="false" aria-controls="faqThree">
+                                        When does it ship, and where?
+                                    </button>
+                                </h2>
+                                <div id="faqThree" class="accordion-collapse collapse" aria-labelledby="faqHeadThree"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <p>Estimated delivery is June 2027, roughly 10 months after the campaign closes.
+                                            Hardware reward tiers ship to the United States.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faqHeadFour">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faqFour" aria-expanded="false" aria-controls="faqFour">
+                                        Risks and challenges
+                                    </button>
+                                </h2>
+                                <div id="faqFour" class="accordion-collapse collapse" aria-labelledby="faqHeadFour"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <p>We've carried LumenEars from a bare circuit board to working, motion-reactive
+                                            hardware &mdash; which means we've already met most of the hard problems.
+                                            Here's an honest look at what's left and how we're handling it.</p>
+                                        <p><strong>Certification.</strong> Wireless wearables need FCC/CE testing, which
+                                            takes time and can require small board revisions. We've budgeted for a full
+                                            test cycle plus one revision in both the schedule and the funding goal.</p>
+                                        <p><strong>Tooling and fit.</strong> Turning our prototype housing into finalized
+                                            production-ready designs is hard work. Part of this raise pays for proper
+                                            tooling and a comfort/fit pass before mass production.</p>
+                                        <p><strong>Battery safety.</strong> We use a protected LiPo cell and standard
+                                            USB-C charging, and battery packs will be certified to the appropriate
+                                            transport and safety standards before they ship.</p>
+                                        <p><strong>Software polish.</strong> The engine works; the last mile is
+                                            stability, tuning motion feel, and working on the party games side of the
+                                            project. Firmware updates arrive over WiFi, so improvements reach your ears
+                                            after delivery, too.</p>
+                                        <p><strong>Fulfillment.</strong> We're planning realistic shipping windows based
+                                            on the expected timeline to completion.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faqHeadFive">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faqFive" aria-expanded="false" aria-controls="faqFive">
+                                        Use of AI
+                                    </button>
+                                </h2>
+                                <div id="faqFive" class="accordion-collapse collapse" aria-labelledby="faqHeadFive"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <p>We used AI-assisted tools during marketing and development around the concept
+                                            to give users a tangible product visual. Visuals generated &mdash; including
+                                            product renders and character art &mdash; were created using AI tools, then
+                                            selected and refined by our team. Actual animations are created manually, to
+                                            take the concept and implement it in our current prototypes for testing.</p>
+                                        <p>The goal is to help people see the goal of our product, not to generate
+                                            unrealistic expectations. We already have a physical prototype of the
+                                            product with animations and games, and want to turn it into something
+                                            everyone can love and enjoy.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="text-center section-title-wrap reveal">
+                            <span class="eyebrow">Stay in the loop</span>
+                            <h2 class="mb-4">Get the launch-day link</h2>
+                            <p class="lead-text mb-0">Early Glow is capped at 150 headbands. Leave your email and we'll
+                                tell you the moment the campaign goes live.</p>
+                        </div>
 
                         <nav class="d-flex justify-content-center">
                             <div class="nav nav-tabs align-items-baseline justify-content-center" id="nav-tab"
                                 role="tablist">
                                 <button class="nav-link active" id="nav-ContactForm-tab" data-bs-toggle="tab"
                                     data-bs-target="#nav-ContactForm" type="button" role="tab"
-                                    aria-controls="nav-ContactForm" aria-selected="false">
-                                    <h5>Contact Form</h5>
+                                    aria-controls="nav-ContactForm" aria-selected="true">
+                                    <h5>Notify me</h5>
                                 </button>
 
-                                <button class="nav-link" id="nav-ContactMap-tab" data-bs-toggle="tab"
-                                    data-bs-target="#nav-ContactMap" type="button" role="tab"
-                                    aria-controls="nav-ContactMap" aria-selected="false">
-                                    <h5>Google Maps</h5>
+                                <button class="nav-link" id="nav-Press-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-Press" type="button" role="tab" aria-controls="nav-Press"
+                                    aria-selected="false">
+                                    <h5>Press &amp; partners</h5>
                                 </button>
                             </div>
                         </nav>
@@ -526,8 +1021,8 @@ https://templatemo.com/tm-583-festava-live
                         <div class="tab-content shadow-lg mt-5" id="nav-tabContent">
                             <div class="tab-pane fade show active" id="nav-ContactForm" role="tabpanel"
                                 aria-labelledby="nav-ContactForm-tab">
-                                <form class="custom-form contact-form mb-5 mb-lg-0" action="#" method="post"
-                                    role="form">
+                                <form class="custom-form contact-form mb-0" action="#" method="post" role="form"
+                                    data-static-form>
                                     <div class="contact-form-body">
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6 col-12">
@@ -542,26 +1037,46 @@ https://templatemo.com/tm-583-festava-live
                                             </div>
                                         </div>
 
-                                        <input type="text" name="contact-company" id="contact-company"
-                                            class="form-control" placeholder="Company" required>
+                                        <select name="contact-tier" id="contact-tier" class="form-control"
+                                            data-tier-target>
+                                            <option value="">Which tier are you eyeing? (optional)</option>
+                                            <option value="glow-supporter">Glow Supporter — $25</option>
+                                            <option value="early-glow">Early Glow — $189</option>
+                                            <option value="early-bird">Early Bird — $209</option>
+                                            <option value="lumenears">LumenEars — $239</option>
+                                            <option value="creator-edition">Creator Edition — $289</option>
+                                            <option value="duo-pack">Duo Pack — $449</option>
+                                            <option value="workshop-5-pack">Workshop 5-Pack — $999</option>
+                                            <option value="co-creator">Co-Creator — $2,500</option>
+                                        </select>
 
                                         <textarea name="contact-message" rows="3" class="form-control"
-                                            id="contact-message" placeholder="Message"></textarea>
+                                            id="contact-message"
+                                            placeholder="Anything you want us to know? (optional)"></textarea>
 
-                                        <div class="col-lg-4 col-md-10 col-8 mx-auto">
-                                            <button type="submit" class="form-control">Send message</button>
+                                        <div class="col-lg-5 col-md-8 col-10 mx-auto">
+                                            <button type="submit" class="form-control">Notify me at launch</button>
                                         </div>
+
+                                        <p class="form-note text-center mt-4 mb-0" data-form-note>Launch news only. No
+                                            spam, and you can unsubscribe any time.</p>
                                     </div>
                                 </form>
                             </div>
 
-                            <div class="tab-pane fade" id="nav-ContactMap" role="tabpanel"
-                                aria-labelledby="nav-ContactMap-tab">
-                                <iframe class="google-map"
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29974.469402870927!2d120.94861466021855!3d14.106066818082482!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd777b1ab54c8f%3A0x6ecc514451ce2be8!2sTagaytay%2C%20Cavite%2C%20Philippines!5e1!3m2!1sen!2smy!4v1670344209509!5m2!1sen!2smy"
-                                    width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"
-                                    referrerpolicy="no-referrer-when-downgrade"></iframe>
-                                <!-- You can easily copy the embed code from Google Maps -> Share -> Embed a map // -->
+                            <div class="tab-pane fade" id="nav-Press" role="tabpanel" aria-labelledby="nav-Press-tab">
+                                <h3 class="text-white mb-3">Working on a story or a stocking order?</h3>
+                                <p>We're happy to send a press kit with product renders, character art and specs, or to
+                                    talk about retail, classroom and event orders.</p>
+
+                                <ul class="check-list">
+                                    <li>Press kit: renders, character art, campaign graphics</li>
+                                    <li>Review units for outlets covering wearables and maker hardware</li>
+                                    <li>Bulk pricing for classrooms, teams and events &mdash; start with the Workshop
+                                        5-Pack</li>
+                                </ul>
+
+                                <a href="mailto:hello@lumenears.com" class="btn custom-btn mt-3">Email the team</a>
                             </div>
                         </div>
                     </div>
@@ -575,41 +1090,35 @@ https://templatemo.com/tm-583-festava-live
     <footer class="site-footer">
         <div class="site-footer-top">
             <div class="container">
-                <div class="row">
+                <div class="row align-items-center">
 
                     <div class="col-lg-6 col-12">
-                        <h2 class="text-white mb-lg-0">Festava Live</h2>
+                        <h2 class="text-white mb-3 mb-lg-0">LumenEars</h2>
                     </div>
 
                     <div class="col-lg-6 col-12 d-flex justify-content-lg-end align-items-center">
-                        <ul class="social-icon d-flex justify-content-lg-end">
+                        <ul class="social-icon d-flex justify-content-lg-end mb-0">
                             <li class="social-icon-item">
-                                <a href="#" class="social-icon-link">
+                                <a href="#" class="social-icon-link" aria-label="LumenEars on X">
                                     <span class="bi-twitter"></span>
                                 </a>
                             </li>
 
                             <li class="social-icon-item">
-                                <a href="#" class="social-icon-link">
-                                    <span class="bi-apple"></span>
-                                </a>
-                            </li>
-
-                            <li class="social-icon-item">
-                                <a href="#" class="social-icon-link">
+                                <a href="#" class="social-icon-link" aria-label="LumenEars on Instagram">
                                     <span class="bi-instagram"></span>
                                 </a>
                             </li>
 
                             <li class="social-icon-item">
-                                <a href="#" class="social-icon-link">
-                                    <span class="bi-youtube"></span>
+                                <a href="#" class="social-icon-link" aria-label="LumenEars on TikTok">
+                                    <span class="bi-tiktok"></span>
                                 </a>
                             </li>
 
                             <li class="social-icon-item">
-                                <a href="#" class="social-icon-link">
-                                    <span class="bi-pinterest"></span>
+                                <a href="#" class="social-icon-link" aria-label="LumenEars on YouTube">
+                                    <span class="bi-youtube"></span>
                                 </a>
                             </li>
                         </ul>
@@ -621,32 +1130,36 @@ https://templatemo.com/tm-583-festava-live
         <div class="container">
             <div class="row">
 
-                <div class="col-lg-6 col-12 mb-4 pb-2">
-                    <h5 class="site-footer-title mb-3">Links</h5>
+                <div class="col-lg-5 col-12 mb-4 pb-2">
+                    <h5 class="site-footer-title mb-3">Explore</h5>
 
                     <ul class="site-footer-links">
                         <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Home</a>
+                            <a href="#section_1" class="site-footer-link">Home</a>
                         </li>
 
                         <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">About</a>
+                            <a href="#section_2" class="site-footer-link">About</a>
                         </li>
 
                         <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Artists</a>
+                            <a href="#section_3" class="site-footer-link">Characters</a>
                         </li>
 
                         <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Schedule</a>
+                            <a href="#section_4" class="site-footer-link">How It Works</a>
                         </li>
 
                         <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Pricing</a>
+                            <a href="#section_5" class="site-footer-link">Rewards</a>
                         </li>
 
                         <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Contact</a>
+                            <a href="#section_6" class="site-footer-link">Roadmap</a>
+                        </li>
+
+                        <li class="site-footer-link-item">
+                            <a href="#section_7" class="site-footer-link">FAQ</a>
                         </li>
                     </ul>
                 </div>
@@ -655,34 +1168,24 @@ https://templatemo.com/tm-583-festava-live
                     <h5 class="site-footer-title mb-3">Have a question?</h5>
 
                     <p class="text-white d-flex mb-1">
-                        <a href="tel: 090-080-0760" class="site-footer-link">
-                            090-080-0760
+                        <a href="mailto:hello@lumenears.com" class="site-footer-link">
+                            hello@lumenears.com
                         </a>
                     </p>
 
-                    <p class="text-white d-flex">
-                        <a href="mailto:hello@company.com" class="site-footer-link">
-                            hello@company.com
+                    <p class="d-flex">
+                        <a href="pledge.html" data-ks-link class="site-footer-link">
+                            Back the project
                         </a>
                     </p>
                 </div>
 
-                <div class="col-lg-3 col-md-6 col-11 mb-4 mb-lg-0 mb-md-0">
-                    <h5 class="site-footer-title mb-3">Location</h5>
+                <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
+                    <h5 class="site-footer-title mb-3">Where we are</h5>
 
-                    <p class="text-white d-flex mt-3 mb-2">
-                        Silang Junction South, Tagaytay, Cavite, Philippines</p>
+                    <p class="mt-3 mb-2">Irvine, California, United States</p>
 
-                    <a class="link-fx-1 color-contrast-higher mt-3" href="#">
-                        <span>Our Maps</span>
-                        <svg class="icon" viewBox="0 0 32 32" aria-hidden="true">
-                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="16" cy="16" r="15.5"></circle>
-                                <line x1="10" y1="18" x2="16" y2="12"></line>
-                                <line x1="16" y1="12" x2="22" y2="18"></line>
-                            </g>
-                        </svg>
-                    </a>
+                    <p class="mb-0">Category: Wearables</p>
                 </div>
             </div>
         </div>
@@ -691,12 +1194,15 @@ https://templatemo.com/tm-583-festava-live
             <div class="container">
                 <div class="row">
 
-                    <div class="col-lg-3 col-12 mt-5">
-                        <p class="copyright-text">Copyright © 2036 Festava Live Company</p>
-                        <p class="copyright-text">Distributed by: <a href="https://themewagon.com">ThemeWagon</a></p>
+                    <div class="col-lg-6 col-12 mt-5">
+                        <p class="copyright-text">Copyright &copy; 2026 LumenEars</p>
+                        <p class="footer-disclaimer mb-0">Some visuals, including product renders and character art,
+                            were created with AI-assisted tools and then selected and refined by our team. Animations
+                            shown are produced manually and run on working prototypes. Specifications and stretch goals
+                            may change as the project progresses.</p>
                     </div>
 
-                    <div class="col-lg-8 col-12 mt-lg-5">
+                    <div class="col-lg-6 col-12 mt-lg-5">
                         <ul class="site-footer-links">
                             <li class="site-footer-link-item">
                                 <a href="#" class="site-footer-link">Terms &amp; Conditions</a>
@@ -707,7 +1213,7 @@ https://templatemo.com/tm-583-festava-live
                             </li>
 
                             <li class="site-footer-link-item">
-                                <a href="#" class="site-footer-link">Your Feedback</a>
+                                <a href="#section_7" class="site-footer-link">Contact</a>
                             </li>
                         </ul>
                     </div>
@@ -716,18 +1222,12 @@ https://templatemo.com/tm-583-festava-live
         </div>
     </footer>
 
-    <!--
-
-T e m p l a t e M o
-
--->
-
     <!-- JAVASCRIPT FILES -->
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.sticky.js"></script>
     <script src="js/click-scroll.js"></script>
     <script src="js/custom.js"></script>
+    <script src="js/lumenears.js"></script>
 
 </body>
 
