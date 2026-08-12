@@ -50,15 +50,6 @@
         }
     }
 
-    if (!KICKSTARTER_URL) {
-        var ksNote = document.querySelector("[data-ks-note]");
-        if (ksNote) {
-            ksNote.innerHTML =
-                '<i class="bi-info-circle me-1"></i> Campaign link goes live with the ' +
-                "Kickstarter — set KICKSTARTER_URL in js/lumenears.js.";
-        }
-    }
-
     /* -----------------------------------------------------
        1c. Render the video section (only if one is configured)
     ----------------------------------------------------- */
