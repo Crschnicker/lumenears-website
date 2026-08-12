@@ -8,7 +8,6 @@ services:
   - type: web
     name: lumenears-website
     runtime: static
-    plan: free
     staticPublishPath: .
     pullRequestPreviewsEnabled: true
 
