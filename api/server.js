@@ -181,7 +181,7 @@ function normalizePhone(raw) {
 function corsHeaders(origin) {
     const headers = {
         Vary: "Origin",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+        "Access-Control-Allow-Methods": "POST, GET, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
         "Access-Control-Max-Age": "86400"
     };
@@ -508,6 +508,36 @@ function laml(message) {
     return `<?xml version="1.0" encoding="UTF-8"?><Response>${body}</Response>`;
 }
 
+// Anything that answers every inbound message can be made to talk to another
+// machine that does the same. Two numbers in this project already point at
+// this endpoint, and an auto-responder on the far end is all it would take,
+// so the catch-all answers a given number at most once a day. STOP and HELP
+// are exempt: those replies are expected, and a loop needs both ends
+// chattering, which a keyword reply does not do.
+const AUTO_REPLY_WINDOW_MS = 24 * 60 * 60 * 1000;
+const autoReplied = new Map();
+
+function shouldAutoReply(from) {
+    const now = Date.now();
+    const last = autoReplied.get(from) || 0;
+
+    if (now - last < AUTO_REPLY_WINDOW_MS) {
+        return false;
+    }
+
+    autoReplied.set(from, now);
+
+    if (autoReplied.size > 5000) {
+        for (const [key, when] of autoReplied) {
+            if (now - when > AUTO_REPLY_WINDOW_MS) {
+                autoReplied.delete(key);
+            }
+        }
+    }
+
+    return true;
+}
+
 const STOP_WORDS = ["stop", "stopall", "unsubscribe", "cancel", "end", "quit", "revoke", "optout"];
 const START_WORDS = ["start", "unstop", "yes"];
 const HELP_WORDS = ["help", "info"];
@@ -555,7 +585,7 @@ async function handleInboundSms(req, res) {
         reply = "You're back on the LumenEars list. We'll text once when the Kickstarter launches. Reply STOP to opt out.";
     } else if (HELP_WORDS.includes(word)) {
         reply = "LumenEars waitlist: we text once when our Kickstarter launches. Help: help@lumenears.com. Reply STOP to opt out.";
-    } else {
+    } else if (from && shouldAutoReply(from)) {
         reply = "Thanks for the message. This number is not monitored — reach us at help@lumenears.com. Reply STOP to opt out.";
     }
 
@@ -671,6 +701,32 @@ async function handleSignup(req, res, headers) {
     }
 }
 
+async function handleRemove(req, res, url, headers) {
+    if (!ADMIN_TOKEN || url.searchParams.get("token") !== ADMIN_TOKEN) {
+        send(res, 401, { ok: false, error: "Unauthorized" }, headers);
+        return;
+    }
+
+    const phone = url.searchParams.get("phone") ? normalizePhone(url.searchParams.get("phone")) : null;
+    const email = (url.searchParams.get("email") || "").trim().toLowerCase() || null;
+
+    if (!phone && !email) {
+        send(res, 400, { ok: false, error: "Pass phone= or email=" }, headers);
+        return;
+    }
+
+    await ready;
+
+    const removed = phone
+        ? await pool.query("DELETE FROM waitlist WHERE phone = $1 RETURNING id", [phone])
+        : await pool.query("DELETE FROM waitlist WHERE lower(email) = $1 RETURNING id", [email]);
+
+    // A deletion forgets the opt-out along with everything else, which is the
+    // point when re-testing your own number — but it is worth knowing that
+    // deleting someone who asked to leave loses that record.
+    send(res, 200, { ok: true, removed: removed.rowCount }, headers);
+}
+
 async function handleExport(req, res, url, headers) {
     if (!ADMIN_TOKEN || url.searchParams.get("token") !== ADMIN_TOKEN) {
         send(res, 401, { ok: false, error: "Unauthorized" }, headers);
@@ -733,6 +789,11 @@ const server = http.createServer(async (req, res) => {
 
         if (req.method === "POST" && url.pathname === "/waitlist") {
             await handleSignup(req, res, headers);
+            return;
+        }
+
+        if (req.method === "DELETE" && url.pathname === "/waitlist/entry") {
+            await handleRemove(req, res, url, headers);
             return;
         }
 

@@ -99,7 +99,7 @@ it on demand. `render.yaml` deploys the whole thing alongside the static site:
 | --- | --- |
 | Popup markup | `index.html`, just above the script tags |
 | Popup behaviour | `js/lumenears.js`, section 3 |
-| API | `api/server.js` — `POST /waitlist`, `POST /sms/inbound`, `GET /healthz`, `GET /waitlist/export` |
+| API | `api/server.js` — `POST /waitlist`, `POST /sms/inbound`, `GET /healthz`, `GET /waitlist/export`, `DELETE /waitlist/entry` |
 | Storage | Render Postgres, one `waitlist` table created (and migrated) on boot |
 | Email | Resend, one confirmation per new address |
 | SMS | SignalWire Compatibility API, one welcome text per new number |
@@ -138,6 +138,10 @@ request. Two things that bite here:
   URL, so `http` vs `https`, a trailing slash, or a different hostname all fail the check
   and return 403. If Render gave the service a different name, fix `PUBLIC_URL` to match
   what you pasted into SignalWire.
+- **The catch-all reply fires once per number per day.** Anything that answers every
+  inbound message can be aimed at another machine that does the same; two numbers in this
+  project already point at this webhook, so an auto-responder on the far end would
+  otherwise bounce messages back and forth indefinitely. HELP and STOP are exempt.
 - **STOP is answered with silence, on purpose.** Carriers send their own opt-out
   confirmation and block anything we add on top, so replying would either be swallowed or
   arrive as a duplicate.
@@ -158,6 +162,13 @@ fresh, deliberate consent — and gets the welcome text again.
 
 ```bash
 curl "https://<service>.onrender.com/waitlist/export?token=$ADMIN_TOKEN" -o waitlist.csv
+```
+
+To re-test with a number that is already on the list — a duplicate signup deliberately
+sends nothing — delete the row first:
+
+```bash
+curl -X DELETE "https://<service>.onrender.com/waitlist/entry?token=$ADMIN_TOKEN&phone=%2B19495550134"
 ```
 
 **Filter on `opted_out` before any launch send.** The column is in the export precisely

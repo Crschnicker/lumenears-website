@@ -25,3 +25,7 @@ _shot*.js
 
 # Node deps for the waitlist API — Render installs these at build time
 api/node_modules/
+
+# Screenshots dropped in the repo root while debugging — these have contained
+# API tokens, and this repo is public.
+/*.png
