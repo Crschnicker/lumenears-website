@@ -594,4 +594,149 @@
         window.setTimeout(openModal, 15000);
     })();
 
+
+    /* -----------------------------------------------------
+       4. Soundtrack
+       Music is opt-in: browsers block autoplay with sound,
+       and a page that starts making noise on its own is
+       worse than one that doesn't. The choice is remembered,
+       so a visitor who turned it on gets it back — but only
+       ever after they click, which satisfies autoplay
+       policy on the return visit too.
+    ----------------------------------------------------- */
+    (function soundtrack() {
+        var audio = document.querySelector("[data-music-audio]");
+        var toggle = document.querySelector("[data-music-toggle]");
+
+        if (!audio || !toggle) {
+            return;
+        }
+
+        var STORAGE_KEY = "lumenears.music";
+        var TARGET_VOLUME = 0.35;
+        var fade = null;
+
+        function remember(value) {
+            try {
+                window.localStorage.setItem(STORAGE_KEY, value);
+            } catch (error) {
+                /* private mode; the toggle still works for this visit */
+            }
+        }
+
+        function wanted() {
+            try {
+                return window.localStorage.getItem(STORAGE_KEY) === "on";
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Cutting straight to 35% is jarring against a quiet page, so both
+        // directions ramp over about half a second.
+        function fadeTo(target, done) {
+            window.clearInterval(fade);
+
+            var step = (target - audio.volume) / 12;
+
+            fade = window.setInterval(function () {
+                var next = audio.volume + step;
+
+                if ((step > 0 && next >= target) || (step < 0 && next <= target) || step === 0) {
+                    audio.volume = target;
+                    window.clearInterval(fade);
+
+                    if (done) {
+                        done();
+                    }
+
+                    return;
+                }
+
+                audio.volume = next;
+            }, 40);
+        }
+
+        function setPressed(on) {
+            toggle.setAttribute("aria-pressed", on ? "true" : "false");
+            toggle.setAttribute("aria-label", on ? "Mute background music" : "Play background music");
+            toggle.setAttribute("title", on ? "Mute music" : "Play music");
+        }
+
+        function start() {
+            audio.volume = 0;
+
+            var attempt = audio.play();
+
+            if (attempt && attempt.catch) {
+                attempt.catch(function () {
+                    // Autoplay refused — leave the button in its off state
+                    // rather than claiming to play something silent.
+                    setPressed(false);
+                    remember("off");
+                });
+            }
+
+            fadeTo(TARGET_VOLUME);
+            setPressed(true);
+            remember("on");
+        }
+
+        function stop(persist) {
+            fadeTo(0, function () {
+                audio.pause();
+            });
+
+            setPressed(false);
+
+            if (persist) {
+                remember("off");
+            }
+        }
+
+        toggle.addEventListener("click", function () {
+            if (toggle.getAttribute("aria-pressed") === "true") {
+                stop(true);
+            } else {
+                start();
+            }
+        });
+
+        // The hero video has its own audio when someone taps Watch, and two
+        // soundtracks at once is nobody's idea of a good time.
+        var heroVideo = document.querySelector("[data-hero-video]");
+
+        if (heroVideo) {
+            heroVideo.addEventListener("volumechange", function () {
+                if (!heroVideo.muted && toggle.getAttribute("aria-pressed") === "true") {
+                    stop(false);
+                }
+            });
+        }
+
+        // Leaving the tab should not leave music playing behind it.
+        document.addEventListener("visibilitychange", function () {
+            if (document.hidden) {
+                if (!audio.paused) {
+                    audio.pause();
+                }
+            } else if (toggle.getAttribute("aria-pressed") === "true" && audio.paused) {
+                audio.play().catch(function () { /* nothing to do */ });
+            }
+        });
+
+        // A returning visitor asked for music last time, but the browser still
+        // wants a gesture first, so it starts on whatever they touch next.
+        if (wanted()) {
+            var resume = function () {
+                document.removeEventListener("click", resume);
+                document.removeEventListener("keydown", resume);
+                start();
+            };
+
+            document.addEventListener("click", resume);
+            document.addEventListener("keydown", resume);
+        }
+    })();
+
 })();

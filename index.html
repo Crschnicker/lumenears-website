@@ -1356,6 +1356,24 @@ https://templatemo.com/tm-583-festava-live
         </div>
     </footer>
 
+    <!-- ======================= SOUNDTRACK =======================
+         Off until asked for, and preload="none" so the file is not
+         fetched at all unless someone turns it on. -->
+    <audio loop preload="none" data-music-audio>
+        <source src="audio/neon-return.mp3" type="audio/mpeg">
+    </audio>
+
+    <button type="button" class="music-toggle" data-music-toggle aria-pressed="false"
+        aria-label="Play background music" title="Play music">
+        <span class="music-icon" aria-hidden="true">
+            <i class="bi-music-note-beamed music-icon-off"></i>
+            <span class="music-bars">
+                <span></span><span></span><span></span>
+            </span>
+        </span>
+    </button>
+
+
     <!-- ======================= WAITLIST POPUP =======================
          Opens 15s into a first visit, then never again once the visitor
          has joined or closed it. Markup lives here (not in JS) so the

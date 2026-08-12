@@ -55,21 +55,34 @@ the tier list on the page is information only.
    Re-check the trim points against the new footage — `ffmpeg -i in.mp4 -vf blackdetect -f null -`
    finds the black runs. 139 MB master in, 5.9 MB out (video + AAC audio).
 
-3. **Campaign video.** Set `CAMPAIGN_VIDEO.src` in `js/lumenears.js` — a local file
+3. **Music.** `audio/neon-return.mp3` plays only when a visitor presses the toggle in the
+   bottom-right corner. It is `preload="none"`, so the 1.7 MB file is never fetched
+   otherwise, and the choice is stored in `localStorage`. A returning visitor who left it
+   on gets it back on their first click — browsers refuse to start audio without a
+   gesture, and the toggle would otherwise sit there lying about playing. Turning on the
+   hero video's sound stops the music rather than talking over it. To swap the track,
+   re-encode over the same filename:
+
+   ```bash
+   ffmpeg -y -i "New Track.mp3" -vn -c:a libmp3lame -b:a 112k -ar 44100 audio/neon-return.mp3
+   ```
+
+   (`-vn` matters: the master carried embedded cover art, which is dead weight here.)
+4. **Campaign video.** Set `CAMPAIGN_VIDEO.src` in `js/lumenears.js` — a local file
    (`video/lumenears.mp4`), `youtube:VIDEO_ID`, or `vimeo:VIDEO_ID`. The section stays
    hidden while it is empty, so there is never a broken player. Hosted embeds are
    click-to-load: no third-party scripts or cookies until the viewer presses play.
-4. **Waitlist API.** The popup needs the service in `api/` to be live — see
+5. **Waitlist API.** The popup needs the service in `api/` to be live — see
    [Waitlist](#waitlist) below. Set `WAITLIST_ENDPOINT` in `js/lumenears.js` to its
    real Render hostname, and set `RESEND_API_KEY` and `ADMIN_TOKEN` in the dashboard.
    Blank the endpoint and the popup never opens, so the site still works without it.
-5. **Legal pages.** `terms.html` and `privacy.html` are written and linked from the
+6. **Legal pages.** `terms.html` and `privacy.html` are written and linked from the
    footer. Two deliberately loud yellow placeholders remain in `privacy.html`
    (`[HOSTING PROVIDER]`, `[RETENTION PERIOD]`) and must be filled in — search for
    `legal-todo`. The pages are drafted from what the site actually does; they are not
    legal advice and should be reviewed by a lawyer. Governing law is set to Orange
    County, California.
-6. **Google Fonts.** The pages load Outfit from `fonts.googleapis.com`, which sends every
+7. **Google Fonts.** The pages load Outfit from `fonts.googleapis.com`, which sends every
    visitor's IP to Google and is disclosed in the privacy policy. Self-hosting the font
    removes that third-party request and shortens the policy.
 
@@ -177,6 +190,8 @@ css/
   lumenears.css                  the LumenEars theme — all overrides live here
 video/
   hero.mp4                       hero background loop (web encode; the raw master is gitignored)
+audio/
+  neon-return.mp3                opt-in soundtrack, 112 kbps (the raw master is gitignored)
 js/
   lumenears.js                   KS link rewrite, campaign video embed, scroll reveals, waitlist popup
   click-scroll.js                nav scroll-spy (reworked to read sections from the nav)

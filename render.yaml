@@ -35,6 +35,9 @@ services:
       - path: /images/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
+      - path: /audio/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
       - path: /fonts/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
