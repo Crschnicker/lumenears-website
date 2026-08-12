@@ -333,6 +333,11 @@ strong, b {
 .navbar-expand-lg .navbar-nav .nav-link {
   margin: 2px;
   padding: 8px 14px;
+  white-space: nowrap;
+}
+
+.navbar .custom-btn {
+  white-space: nowrap;
 }
 
 .navbar-nav .nav-link.active,
@@ -1774,6 +1779,20 @@ button:focus-visible {
 /*---------------------------------------
   RESPONSIVE
 -----------------------------------------*/
+/* Nine top-level items plus the CTA only just clear a 1440px viewport, so the
+   row tightens instead of wrapping onto a second line on smaller laptops. */
+@media screen and (min-width: 992px) and (max-width: 1399px) {
+  .navbar-expand-lg .navbar-nav .nav-link {
+    margin: 2px 0;
+    padding: 8px 9px;
+    font-size: 15px;
+  }
+
+  .navbar-nav {
+    margin-right: 1rem !important;
+  }
+}
+
 @media screen and (max-width: 1199px) {
   :root { --h1-font-size: 68px; }
 }
