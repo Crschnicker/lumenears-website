@@ -13,19 +13,23 @@ python -m http.server 5173
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Single-page campaign site: hero, about, characters, how it works, why back now, reward tiers, stretch goals + timeline, FAQ/risks/AI disclosure, launch-list form |
+| `index.html` | Single-page campaign site: hero, campaign video, about, characters, games, how it works, why back now, reward tiers, stretch goals + timeline, FAQ/risks/AI disclosure, launch-list form |
 | `pledge.html` | Tier picker + launch-list signup, linked from every "Back this project" button |
 
-## Before launch — the three things to change
+## Before launch
 
 1. **Kickstarter URL.** Open `js/lumenears.js` and set `KICKSTARTER_URL` to the live
    campaign link. Every element with `data-ks-link` (nav buttons, hero CTA, tier buttons,
    footer) repoints to it automatically and opens in a new tab. While it's empty those
    links fall back to `pledge.html`.
-2. **Forms.** The two forms are static — they call `preventDefault()` and show a note.
+2. **Campaign video.** Set `CAMPAIGN_VIDEO.src` in `js/lumenears.js` — a local file
+   (`video/lumenears.mp4`), `youtube:VIDEO_ID`, or `vimeo:VIDEO_ID`. The section stays
+   hidden while it is empty, so there is never a broken player. Hosted embeds are
+   click-to-load: no third-party scripts or cookies until the viewer presses play.
+3. **Forms.** The two forms are static — they call `preventDefault()` and show a note.
    Point them at your email provider (Mailchimp/ConvertKit/Formspree action URL) and
    drop the `data-static-form` attribute.
-3. **Placeholders.** `hello@lumenears.com`, the social links in the footer, and the
+4. **Placeholders.** `hello@lumenears.com`, the social links in the footer, and the
    Terms/Privacy links are all `#` or made-up. Fill them in.
 
 ## Structure

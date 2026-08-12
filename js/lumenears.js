@@ -13,6 +13,23 @@
     ----------------------------------------------------- */
     var KICKSTARTER_URL = "";
 
+    /* -----------------------------------------------------
+       1b. Campaign video
+       Set `src` and the video section appears. Leave it empty
+       and the section stays hidden — no broken player, no gap.
+
+         local file : "video/lumenears.mp4"  (drop the file in video/)
+         YouTube    : "youtube:dQw4w9WgXcQ"
+         Vimeo      : "vimeo:123456789"
+
+       Embeds are click-to-load, so YouTube/Vimeo scripts and
+       cookies never touch a visitor who doesn't press play.
+    ----------------------------------------------------- */
+    var CAMPAIGN_VIDEO = {
+        src: "",
+        poster: "images/lumenears/hero-ears.jpg"
+    };
+
     if (KICKSTARTER_URL) {
         var ksLinks = document.querySelectorAll("[data-ks-link]");
         for (var i = 0; i < ksLinks.length; i++) {
@@ -21,6 +38,75 @@
             ksLinks[i].setAttribute("rel", "noopener");
         }
     }
+
+    /* -----------------------------------------------------
+       1c. Render the video section (only if one is configured)
+    ----------------------------------------------------- */
+    (function renderVideo() {
+        var section = document.querySelector("[data-video-section]");
+        var mount = document.querySelector("[data-video-mount]");
+
+        if (!section || !mount || !CAMPAIGN_VIDEO.src) {
+            return;
+        }
+
+        var src = CAMPAIGN_VIDEO.src;
+        var host = null;
+        var id = null;
+
+        if (src.indexOf("youtube:") === 0) {
+            host = "youtube";
+            id = src.slice(8);
+        } else if (src.indexOf("vimeo:") === 0) {
+            host = "vimeo";
+            id = src.slice(6);
+        }
+
+        if (!host) {
+            // Self-hosted file — no facade needed.
+            var video = document.createElement("video");
+            video.className = "video-player";
+            video.setAttribute("controls", "");
+            video.setAttribute("playsinline", "");
+            video.setAttribute("preload", "none");
+            if (CAMPAIGN_VIDEO.poster) {
+                video.setAttribute("poster", CAMPAIGN_VIDEO.poster);
+            }
+            video.innerHTML =
+                '<source src="' + src + '" type="video/mp4">' +
+                "Your browser does not support the video tag.";
+            mount.appendChild(video);
+            section.hidden = false;
+            return;
+        }
+
+        // Hosted embed: show a poster + play button, swap in the iframe on click.
+        var facade = document.createElement("button");
+        facade.type = "button";
+        facade.className = "video-facade";
+        facade.setAttribute("aria-label", "Play the LumenEars campaign video");
+        if (CAMPAIGN_VIDEO.poster) {
+            facade.style.backgroundImage = "url('" + CAMPAIGN_VIDEO.poster + "')";
+        }
+        facade.innerHTML = '<span class="video-play"><i class="bi-play-fill"></i></span>';
+
+        facade.addEventListener("click", function () {
+            var iframe = document.createElement("iframe");
+            iframe.className = "video-player";
+            iframe.setAttribute("allow",
+                "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
+            iframe.setAttribute("allowfullscreen", "");
+            iframe.setAttribute("title", "LumenEars campaign video");
+            iframe.src = host === "youtube"
+                ? "https://www.youtube-nocookie.com/embed/" + id + "?autoplay=1&rel=0"
+                : "https://player.vimeo.com/video/" + id + "?autoplay=1";
+            mount.innerHTML = "";
+            mount.appendChild(iframe);
+        });
+
+        mount.appendChild(facade);
+        section.hidden = false;
+    })();
 
     /* -----------------------------------------------------
        2. Reveal on scroll
