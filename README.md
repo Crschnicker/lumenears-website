@@ -15,7 +15,7 @@ python -m http.server 5173
 | --- | --- |
 | `terms.html` | Terms &amp; Conditions |
 | `privacy.html` | Privacy Policy |
-| `index.html` | The whole site: hero video, campaign video, about, characters, games, how it works, why back now, reward tiers, stretch goals + timeline, FAQ/risks/AI disclosure, Kickstarter hand-off |
+| `index.html` | The whole site: hero video, campaign video, about, characters, games, how it works, why back now, reward tiers, stretch goals + timeline, about us/founder, FAQ/risks/AI disclosure, Kickstarter hand-off |
 
 There is no on-site pledge flow. Every CTA opens the Kickstarter campaign in a new tab;
 the tier list on the page is information only.
