@@ -15,6 +15,7 @@ python -m http.server 5173
 | --- | --- |
 | `terms.html` | Terms &amp; Conditions |
 | `privacy.html` | Privacy Policy |
+| `api/` | Node service behind the waitlist popup: stores signups in Postgres, sends the confirmation through Resend |
 | `index.html` | The whole site: hero video, campaign video, about, characters, games, how it works, why back now, reward tiers, stretch goals + timeline, about us/founder, FAQ/risks/AI disclosure, Kickstarter hand-off |
 
 There is no on-site pledge flow. Every CTA opens the Kickstarter campaign in a new tab;
@@ -58,8 +59,10 @@ the tier list on the page is information only.
    (`video/lumenears.mp4`), `youtube:VIDEO_ID`, or `vimeo:VIDEO_ID`. The section stays
    hidden while it is empty, so there is never a broken player. Hosted embeds are
    click-to-load: no third-party scripts or cookies until the viewer presses play.
-4. **Forms.** There are none. Email capture was removed along with the pledge page —
-   the site collects nothing and everything routes to Kickstarter.
+4. **Waitlist API.** The popup needs the service in `api/` to be live — see
+   [Waitlist](#waitlist) below. Set `WAITLIST_ENDPOINT` in `js/lumenears.js` to its
+   real Render hostname, and set `RESEND_API_KEY` and `ADMIN_TOKEN` in the dashboard.
+   Blank the endpoint and the popup never opens, so the site still works without it.
 5. **Legal pages.** `terms.html` and `privacy.html` are written and linked from the
    footer. Two deliberately loud yellow placeholders remain in `privacy.html`
    (`[HOSTING PROVIDER]`, `[RETENTION PERIOD]`) and must be filled in — search for
@@ -69,6 +72,65 @@ the tier list on the page is information only.
 6. **Google Fonts.** The pages load Outfit from `fonts.googleapis.com`, which sends every
    visitor's IP to Google and is disclosed in the privacy policy. Self-hosting the font
    removes that third-party request and shortens the policy.
+
+
+## Waitlist
+
+A popup opens 15 seconds into a first visit and asks for an email address so the
+Kickstarter link can be sent on launch day. It never reappears once someone joins or
+closes it (one key in `localStorage`), and the footer link `data-waitlist-open` reopens
+it on demand. `render.yaml` deploys the whole thing alongside the static site:
+
+| Piece | Where |
+| --- | --- |
+| Popup markup | `index.html`, just above the script tags |
+| Popup behaviour | `js/lumenears.js`, section 3 |
+| API | `api/server.js` — `POST /waitlist`, `GET /healthz`, `GET /waitlist/export` |
+| Storage | Render Postgres, one `waitlist` table created on boot |
+| Email | Resend, one confirmation per new address |
+
+### Setting it up
+
+1. Deploy the blueprint. Render creates `lumenears-waitlist-api` and its database.
+2. Copy the service's real hostname into `WAITLIST_ENDPOINT` in `js/lumenears.js` —
+   Render appends a suffix if the name is taken, so do not assume it.
+3. In the Render dashboard set the two secrets the blueprint deliberately does not
+   carry: `RESEND_API_KEY` and `ADMIN_TOKEN` (any long random string — it guards the
+   CSV export).
+4. Verify `lumenears.com` in Resend, then leave `RESEND_FROM` as
+   `LumenEars <help@lumenears.com>`. Until the domain is verified, Resend only
+   delivers from `onboarding@resend.dev`, which is what the code falls back to.
+
+### Getting the list out
+
+```bash
+curl "https://<service>.onrender.com/waitlist/export?token=$ADMIN_TOKEN" -o waitlist.csv
+```
+
+### Things to know
+
+- **Both free plans have teeth.** A free web service sleeps after 15 minutes idle and
+  takes ~50s to wake, so the first signup of the day is slow — the popup waits 70s and
+  says so rather than failing. Render's free Postgres expires 30 days after creation.
+  $7/month for the service and a paid database removes both problems, and is worth it
+  for the duration of a campaign.
+- **Duplicates are not an error.** A repeat address returns `alreadyOnList: true` and
+  sends no second email, so the form cannot be used to mailbomb a stranger.
+- **Anti-spam** is a honeypot field plus 5 signups per IP per 10 minutes, in memory.
+- **CORS** is limited to `ALLOWED_ORIGINS` in `render.yaml`. Add any preview domain
+  there or the browser will block the request.
+- The privacy policy (section 4) and terms (section 2) describe this list. If what the
+  list is used for changes, those change first.
+
+### Running it locally
+
+```bash
+cd api && npm install
+DATABASE_URL=postgres://localhost/lumenears RESEND_API_KEY= node server.js
+```
+
+With `RESEND_API_KEY` empty the signup is stored and the email is skipped, which is
+usually what you want while testing.
 
 ## Deploying
 
@@ -106,10 +168,13 @@ css/
 video/
   hero.mp4                       hero background loop (web encode; the raw master is gitignored)
 js/
-  lumenears.js                   KS link rewrite, campaign video embed, scroll reveals
+  lumenears.js                   KS link rewrite, campaign video embed, scroll reveals, waitlist popup
   click-scroll.js                nav scroll-spy (reworked to read sections from the nav)
   custom.js                      template helper (mobile menu, smooth scroll)
 images/lumenears/                campaign artwork, optimized for web
+api/
+  server.js                      waitlist API — Postgres storage plus the Resend confirmation
+  package.json                   one dependency (pg); Render runs `npm install` here
 ```
 
 `templatemo-festava-live.css` is left untouched so the template can be diffed or updated;

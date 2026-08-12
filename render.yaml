@@ -63,3 +63,35 @@ services:
       - type: rewrite
         source: /privacy
         destination: /privacy.html
+
+  # Waitlist signups from the popup: stores the address and hands Resend the
+  # confirmation email. Kept separate from the static site so the marketing
+  # page stays a pile of files on a CDN.
+  - type: web
+    name: lumenears-waitlist-api
+    runtime: node
+    rootDir: api
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lumenears-waitlist-db
+          property: connectionString
+      # Secrets: set these in the Render dashboard, not here.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: RESEND_FROM
+        value: LumenEars <help@lumenears.com>
+      - key: ALLOWED_ORIGINS
+        value: https://lumenears.com,https://www.lumenears.com
+
+databases:
+  - name: lumenears-waitlist-db
+    databaseName: lumenears
+    user: lumenears
+    plan: free

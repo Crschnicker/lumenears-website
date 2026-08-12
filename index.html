@@ -1306,6 +1306,12 @@ https://templatemo.com/tm-583-festava-live
                             Back the project
                         </a>
                     </p>
+
+                    <p class="d-flex">
+                        <a href="#" data-waitlist-open class="site-footer-link">
+                            Join the launch waitlist
+                        </a>
+                    </p>
                 </div>
 
                 <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
@@ -1349,6 +1355,46 @@ https://templatemo.com/tm-583-festava-live
             </div>
         </div>
     </footer>
+
+    <!-- ======================= WAITLIST POPUP =======================
+         Opens 15s into a first visit, then never again once the visitor
+         has joined or closed it. Markup lives here (not in JS) so the
+         copy is editable without touching behaviour. -->
+    <div class="waitlist-overlay" data-waitlist-overlay hidden>
+        <div class="waitlist-modal" role="dialog" aria-modal="true" aria-labelledby="waitlist-title"
+            aria-describedby="waitlist-blurb" data-waitlist-modal>
+
+            <button type="button" class="waitlist-close" data-waitlist-close aria-label="Close">
+                <i class="bi-x-lg" aria-hidden="true"></i>
+            </button>
+
+            <span class="eyebrow">Launching soon</span>
+            <h2 id="waitlist-title">Be first to know</h2>
+
+            <p id="waitlist-blurb">Leave your email and we'll send you the Kickstarter link the moment the
+                campaign goes live &mdash; along with the launch-day pledge tiers. That's the only reason
+                we'll write.</p>
+
+            <form class="waitlist-form" data-waitlist-form novalidate>
+                <label class="visually-hidden" for="waitlist-email">Email address</label>
+                <input class="waitlist-input" id="waitlist-email" type="email" name="email" required
+                    autocomplete="email" placeholder="you@example.com" data-waitlist-email>
+
+                <!-- Honeypot: hidden from people, irresistible to bots. -->
+                <div class="waitlist-hp" aria-hidden="true">
+                    <label for="waitlist-company">Company</label>
+                    <input id="waitlist-company" type="text" name="company" tabindex="-1" autocomplete="off">
+                </div>
+
+                <button class="btn custom-btn w-100" type="submit" data-waitlist-submit>Join the waitlist</button>
+            </form>
+
+            <p class="waitlist-status" data-waitlist-status role="status" aria-live="polite"></p>
+
+            <p class="waitlist-fineprint">No spam, no sharing your address. Unsubscribe in one click.
+                <a href="privacy.html">Privacy policy</a>.</p>
+        </div>
+    </div>
 
     <!-- JAVASCRIPT FILES -->
     <script src="js/jquery.min.js"></script>

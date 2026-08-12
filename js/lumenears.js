@@ -17,6 +17,20 @@
     var KICKSTARTER_URL = "";   // e.g. "https://www.kickstarter.com/projects/lumenears/lumenears"
 
     /* -----------------------------------------------------
+       1a. Waitlist endpoint
+       The Node service in api/, deployed alongside this site
+       by render.yaml. Confirm the hostname in the Render
+       dashboard after the first deploy — Render appends a
+       suffix if the name is already taken.
+
+       Blank it out and the popup never opens.
+    ----------------------------------------------------- */
+    var WAITLIST_ENDPOINT = "https://lumenears-waitlist-api.onrender.com/waitlist";
+
+    // Loose on purpose: the confirmation email is the real check.
+    var EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    /* -----------------------------------------------------
        1b. Campaign video
        Set `src` and the video section appears. Leave it empty
        and the section stays hidden — no broken player, no gap.
@@ -256,5 +270,234 @@
             observer.observe(revealables[j]);
         }
     }
+
+
+    /* -----------------------------------------------------
+       3. Waitlist popup
+       Opens 15 seconds into a first visit and collects an
+       email so the Kickstarter link can be sent on launch
+       day. The endpoint is the Node service in api/ — see
+       WAITLIST_ENDPOINT above. Leave that blank and the
+       popup never opens, so the site degrades to what it
+       was before.
+    ----------------------------------------------------- */
+    (function waitlistPopup() {
+        var overlay = document.querySelector("[data-waitlist-overlay]");
+        var modal = document.querySelector("[data-waitlist-modal]");
+        var form = document.querySelector("[data-waitlist-form]");
+        var input = document.querySelector("[data-waitlist-email]");
+        var status = document.querySelector("[data-waitlist-status]");
+        var submit = document.querySelector("[data-waitlist-submit]");
+
+        if (!overlay || !modal || !form || !input || !status || !submit) {
+            return;
+        }
+
+        var STORAGE_KEY = "lumenears.waitlist";
+        var lastFocused = null;
+        var isOpen = false;
+
+        // Private browsing and locked-down browsers throw on localStorage, and
+        // a popup is not worth breaking the page over.
+        function remembered() {
+            try {
+                return window.localStorage.getItem(STORAGE_KEY);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function remember(value) {
+            try {
+                window.localStorage.setItem(STORAGE_KEY, value);
+            } catch (error) {
+                /* nothing to do */
+            }
+        }
+
+        function openModal() {
+            if (isOpen) {
+                return;
+            }
+
+            isOpen = true;
+            lastFocused = document.activeElement;
+            overlay.hidden = false;
+
+            // Next frame, so the transition has a start value to move from.
+            window.requestAnimationFrame(function () {
+                overlay.classList.add("is-open");
+            });
+
+            document.body.style.overflow = "hidden";
+            input.focus();
+        }
+
+        function closeModal(reason) {
+            if (!isOpen) {
+                return;
+            }
+
+            isOpen = false;
+            overlay.classList.remove("is-open");
+            document.body.style.overflow = "";
+
+            window.setTimeout(function () {
+                overlay.hidden = true;
+            }, 280);
+
+            if (reason) {
+                remember(reason);
+            }
+
+            if (lastFocused && lastFocused.focus) {
+                lastFocused.focus();
+            }
+        }
+
+        // Keep tabbing inside the dialog while it is open.
+        function trapFocus(event) {
+            if (event.key !== "Tab") {
+                return;
+            }
+
+            var focusable = modal.querySelectorAll(
+                "button, [href], input:not([tabindex='-1']), select, textarea"
+            );
+
+            if (!focusable.length) {
+                return;
+            }
+
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
+        function setStatus(message, kind) {
+            status.textContent = message;
+            status.className = "waitlist-status" + (kind ? " is-" + kind : "");
+        }
+
+        overlay.addEventListener("click", function (event) {
+            if (event.target === overlay) {
+                closeModal("dismissed");
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (!isOpen) {
+                return;
+            }
+
+            if (event.key === "Escape") {
+                closeModal("dismissed");
+            } else {
+                trapFocus(event);
+            }
+        });
+
+        var closers = document.querySelectorAll("[data-waitlist-close]");
+
+        for (var c = 0; c < closers.length; c++) {
+            closers[c].addEventListener("click", function () {
+                closeModal("dismissed");
+            });
+        }
+
+        // Anything can reopen the popup on purpose — the footer link uses this,
+        // and it ignores the "already seen it" flag.
+        var openers = document.querySelectorAll("[data-waitlist-open]");
+
+        for (var o = 0; o < openers.length; o++) {
+            openers[o].addEventListener("click", function (event) {
+                event.preventDefault();
+                openModal();
+            });
+        }
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            var email = input.value.trim();
+
+            if (!EMAIL_PATTERN.test(email)) {
+                input.classList.add("is-invalid");
+                setStatus("That email address doesn't look right.", "error");
+                input.focus();
+                return;
+            }
+
+            input.classList.remove("is-invalid");
+            submit.disabled = true;
+            submit.textContent = "Adding you…";
+            setStatus("");
+
+            // The API sits on a free Render instance that sleeps when idle, so
+            // the first request of the day can take the best part of a minute.
+            var controller = "AbortController" in window ? new AbortController() : null;
+            var timer = controller ? window.setTimeout(function () { controller.abort(); }, 70000) : null;
+
+            window.fetch(WAITLIST_ENDPOINT, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: email,
+                    company: form.company ? form.company.value : "",
+                    source: "popup"
+                }),
+                signal: controller ? controller.signal : undefined
+            }).then(function (response) {
+                return response.json().then(function (data) {
+                    return { ok: response.ok, data: data };
+                });
+            }).then(function (result) {
+                if (!result.ok || !result.data.ok) {
+                    throw new Error((result.data && result.data.error) || "Signup failed");
+                }
+
+                remember("joined");
+                modal.setAttribute("data-state", "done");
+
+                setStatus(
+                    result.data.alreadyOnList
+                        ? "You're already on the list — we'll be in touch on launch day."
+                        : "You're on the list. Check your inbox for a confirmation.",
+                    "success"
+                );
+
+                window.setTimeout(function () {
+                    closeModal("joined");
+                }, 3200);
+            }).catch(function (error) {
+                setStatus(
+                    error.name === "AbortError"
+                        ? "That took too long. Try again, or email eesha@rclick.com."
+                        : "Something went wrong. Try again, or email eesha@rclick.com.",
+                    "error"
+                );
+
+                submit.disabled = false;
+                submit.textContent = "Join the waitlist";
+            }).then(function () {
+                if (timer) {
+                    window.clearTimeout(timer);
+                }
+            });
+        });
+
+        if (!WAITLIST_ENDPOINT || remembered()) {
+            return;
+        }
+
+        window.setTimeout(openModal, 15000);
+    })();
 
 })();

@@ -10,6 +10,7 @@ desktop.ini
 
 # Local scratch / screenshot harness
 _shot*.html
+_shot*.js
 
 # Raw video masters — the web-sized encode in video/ is what ships
 /Hero Video.mp4
@@ -18,3 +19,6 @@ _shot*.html
 # Raw photo masters — the web-sized crop in images/lumenears/ is what ships
 /3R4A6968.jpg
 /IMG_6111 (1).JPEG
+
+# Node deps for the waitlist API — Render installs these at build time
+api/node_modules/
