@@ -376,7 +376,17 @@
                 return value;
             }
 
-            var digits = value.replace(/\D/g, "").slice(0, 10);
+            var digits = value.replace(/\D/g, "");
+
+            // Someone typing their country code first would otherwise lose the
+            // last digit to the 10-digit cap, and the server would then prepend
+            // +1 to the wrong ten. No North American area code begins with 1,
+            // so a leading 1 can only be the country code.
+            if (digits.charAt(0) === "1" && digits.length > 1) {
+                digits = digits.slice(1);
+            }
+
+            digits = digits.slice(0, 10);
 
             if (digits.length < 4) {
                 return digits;
@@ -410,6 +420,12 @@
         // anything else has to look like an international number.
         function validPhone(value) {
             var digits = value.replace(/\D/g, "");
+
+            // A bare ten digits starting with 1 is a mistyped number, not an
+            // area code, so it is refused rather than quietly mangled.
+            if (value.charAt(0) !== "+" && digits.length === 10 && digits.charAt(0) === "1") {
+                return false;
+            }
 
             if (value.charAt(0) !== "+" && (digits.length === 10 || (digits.length === 11 && digits.charAt(0) === "1"))) {
                 return true;

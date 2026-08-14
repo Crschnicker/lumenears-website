@@ -162,9 +162,12 @@ function normalizePhone(raw) {
     const digits = input.replace(/\D/g, "");
 
     // A bare 10-digit number is North American; this campaign ships from
-    // California, so that assumption is the friendly one.
+    // California, so that assumption is the friendly one. Ten digits starting
+    // with 1 is not one of those: no area code begins with 1, so that is a
+    // mistyped number, and prefixing +1 would invent a plausible-looking
+    // number nobody can be reached on.
     if (!input.startsWith("+") && digits.length === 10) {
-        return "+1" + digits;
+        return digits.startsWith("1") ? null : "+1" + digits;
     }
 
     if (!input.startsWith("+") && digits.length === 11 && digits.startsWith("1")) {
