@@ -1424,6 +1424,12 @@ https://templatemo.com/tm-583-festava-live
                 reason we'll get in touch.</p>
 
             <form class="waitlist-form" data-waitlist-form novalidate>
+                <!-- Optional, and outside the channel fields so switching between
+                     text and email does not throw away what was typed here. -->
+                <label class="visually-hidden" for="waitlist-name">Your name (optional)</label>
+                <input class="waitlist-input" id="waitlist-name" type="text" name="name" autocomplete="given-name"
+                    maxlength="80" placeholder="First name (optional)" data-waitlist-name>
+
                 <!-- Two channels, one at a time: SMS is the default and email is a
                      click away. Only the visible field is ever submitted. -->
                 <div class="waitlist-field" data-waitlist-field="sms">

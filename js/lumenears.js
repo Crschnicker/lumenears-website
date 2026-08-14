@@ -285,6 +285,7 @@
         var overlay = document.querySelector("[data-waitlist-overlay]");
         var modal = document.querySelector("[data-waitlist-modal]");
         var form = document.querySelector("[data-waitlist-form]");
+        var nameInput = document.querySelector("[data-waitlist-name]");
         var phoneInput = document.querySelector("[data-waitlist-phone]");
         var input = document.querySelector("[data-waitlist-email]");
         var status = document.querySelector("[data-waitlist-status]");
@@ -600,6 +601,7 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
+                    name: nameInput ? nameInput.value.trim() : "",
                     email: isSms ? "" : value,
                     phone: isSms ? value : "",
                     company: form.company ? form.company.value : "",

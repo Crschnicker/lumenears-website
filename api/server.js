@@ -74,6 +74,7 @@ const pool = new Pool({
 const SCHEMA = `
     CREATE TABLE IF NOT EXISTS waitlist (
         id                 bigserial PRIMARY KEY,
+        name               text,
         email              text,
         phone              text,
         source             text,
@@ -95,6 +96,7 @@ const SCHEMA = `
     ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS welcome_sms_sent boolean NOT NULL DEFAULT false;
     ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS opted_out boolean NOT NULL DEFAULT false;
     ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS opted_out_at timestamptz;
+    ALTER TABLE waitlist ADD COLUMN IF NOT EXISTS name text;
 
     ALTER TABLE waitlist DROP CONSTRAINT IF EXISTS waitlist_contact_present;
     ALTER TABLE waitlist ADD CONSTRAINT waitlist_contact_present
@@ -258,7 +260,7 @@ function escapeHtml(value) {
 /* -------------------------------------------------------
    Confirmation email
 ------------------------------------------------------- */
-async function sendConfirmation(email) {
+async function sendConfirmation(email, name) {
     if (!RESEND_API_KEY) {
         console.warn("RESEND_API_KEY is unset — stored the signup, skipped the email");
         return false;
@@ -287,7 +289,7 @@ async function sendConfirmation(email) {
       </p>
 
       <h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#ffffff;font-weight:700">
-        You're in.
+        ${name ? "You're in, " + escapeHtml(name) + "." : "You're in."}
       </h1>
 
       <p style="margin:0 0 16px;font-size:16px;line-height:1.65;color:#c2cee9">
@@ -355,7 +357,7 @@ async function sendConfirmation(email) {
     `.trim();
 
     const text = [
-        "You're in.",
+        name ? "You're in, " + name + "." : "You're in.",
         "",
         "Thanks for joining. LumenEars is a headband with two full-color screens where",
         "the ears would be — characters walk, blink and play across them in real time,",
@@ -622,6 +624,13 @@ async function handleSignup(req, res, headers) {
 
     // The popup offers a phone number first and an email address behind a
     // toggle, so exactly one of these normally arrives. Either is enough.
+    // Optional. Control characters are stripped because this name goes into
+    // an email; the length cap matches the input's maxlength.
+    const name = String(body.name || "")
+        .replace(/[ -]/g, "")
+        .trim()
+        .slice(0, 80) || null;
+
     const rawEmail = String(body.email || "").trim().toLowerCase();
     const email = rawEmail && EMAIL_RE.test(rawEmail) && rawEmail.length <= 254 ? rawEmail : null;
     const phone = body.phone ? normalizePhone(body.phone) : null;
@@ -648,23 +657,24 @@ async function handleSignup(req, res, headers) {
 
     const inserted = email
         ? await pool.query(
-            `INSERT INTO waitlist (email, phone, source, user_agent, consent_text)
-             VALUES ($1, $2, $3, $4, $5)
+            `INSERT INTO waitlist (name, email, phone, source, user_agent, consent_text)
+             VALUES ($1, $2, $3, $4, $5, $6)
              ON CONFLICT (lower(email)) DO NOTHING
              RETURNING id`,
-            [email, phone, source, agent, consent]
+            [name, email, phone, source, agent, consent]
         )
         : await pool.query(
-            `INSERT INTO waitlist (email, phone, source, user_agent, consent_text)
-             VALUES (NULL, $1, $2, $3, $4)
+            `INSERT INTO waitlist (name, email, phone, source, user_agent, consent_text)
+             VALUES ($1, NULL, $2, $3, $4, $5)
              ON CONFLICT (phone) DO UPDATE
                 SET opted_out = false,
                     opted_out_at = NULL,
                     consent_text = EXCLUDED.consent_text,
-                    source = EXCLUDED.source
+                    source = EXCLUDED.source,
+                    name = COALESCE(EXCLUDED.name, waitlist.name)
               WHERE waitlist.opted_out
              RETURNING id`,
-            [phone, source, agent, consent]
+            [name, phone, source, agent, consent]
         );
 
     // Already on the list: say so plainly and send nothing. Re-sending the
@@ -694,7 +704,7 @@ async function handleSignup(req, res, headers) {
     }
 
     try {
-        const sent = await sendConfirmation(email);
+        const sent = await sendConfirmation(email, name);
 
         if (sent) {
             await pool.query("UPDATE waitlist SET confirmation_sent = true WHERE id = $1", [inserted.rows[0].id]);
@@ -739,7 +749,7 @@ async function handleExport(req, res, url, headers) {
     await ready;
 
     const { rows } = await pool.query(
-        `SELECT email, phone, source, created_at, confirmation_sent, welcome_sms_sent,
+        `SELECT name, email, phone, source, created_at, confirmation_sent, welcome_sms_sent,
                 opted_out, opted_out_at, consent_text
          FROM waitlist ORDER BY created_at`
     );
@@ -748,8 +758,9 @@ async function handleExport(req, res, url, headers) {
     const quote = (value) =>
         '"' + String(value === null || value === undefined ? "" : value).replace(/"/g, '""') + '"';
 
-    const csv = ["email,phone,source,created_at,confirmation_sent,welcome_sms_sent,opted_out,opted_out_at,consent_text"]
+    const csv = ["name,email,phone,source,created_at,confirmation_sent,welcome_sms_sent,opted_out,opted_out_at,consent_text"]
         .concat(rows.map((row) => [
+            quote(row.name),
             row.email || "",
             row.phone || "",
             row.source || "",

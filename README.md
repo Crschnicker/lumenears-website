@@ -93,7 +93,10 @@ the tier list on the page is information only.
 
 A popup opens 15 seconds into a first visit and asks for a mobile number — or an
 email address, via the "Rather use email?" link — so the Kickstarter link can be sent
-on launch day. It never reappears once someone joins or
+on launch day. A first name can be given above it and is optional: it sits outside the
+channel fields so switching between text and email keeps it, and it only affects how the
+confirmation email opens ("You're in, Riley."). The welcome text leaves it out, because
+the message is budgeted to a single GSM-7 segment. It never reappears once someone joins or
 closes it (one key in `localStorage`), and the footer link `data-waitlist-open` reopens
 it on demand. `render.yaml` deploys the whole thing alongside the static site:
 
